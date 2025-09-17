@@ -35,6 +35,7 @@ export const sessionMiddleware = createMiddleware<AdditionalContext>(async (c, n
 
     const session = getCookie(c, AUTH_COOKIE)
 
+    // here we are use get cookie from hono cookie (here it is directly the value)
     if (!session) {
         return c.json({error: "Unauthorized"}, 401)
     }
