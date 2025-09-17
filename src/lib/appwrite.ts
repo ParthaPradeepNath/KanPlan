@@ -20,15 +20,13 @@ export async function createSessionClient() {
 
   return {
     get account() {
-        return new Account(client);
+      return new Account(client);
     },
     get databases() {
-        return new Databases(client);
-    }
-    }
-  }
-
-
+      return new Databases(client);
+    },
+  };
+}
 
 export async function createAdminClient() {
   const client = new Client()
@@ -39,6 +37,9 @@ export async function createAdminClient() {
   return {
     get account() {
       return new Account(client);
+    },
+    get users() {
+      return new Users(client);
     },
   };
 }
