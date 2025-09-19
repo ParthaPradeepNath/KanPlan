@@ -52,6 +52,7 @@ export const CreateProjectForm = ({ onCancel }: CreateProjectFormProps) => {
     defaultValues: {
       name: "",
       image: undefined,
+      
     },
   });
 

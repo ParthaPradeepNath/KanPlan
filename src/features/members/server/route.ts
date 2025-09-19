@@ -3,7 +3,6 @@ import { sessionMiddleware } from "@/lib/session-middleware";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { createAdminClient } from "@/lib/appwrite";
-import { get } from "http";
 import { getMember } from "../utils";
 import { DATABASE_ID, MEMBERS_ID } from "@/config";
 import { Query } from "node-appwrite";
