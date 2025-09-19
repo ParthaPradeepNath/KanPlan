@@ -34,7 +34,7 @@ export const CreateTaskFormWrapper = ({
 
   const isLoading = isLoadingProjects || isLoadingMembers;
 
-  if (!isLoading) {
+  if (isLoading) {
     return (
       <Card className="w-full h-[714px] border-none shadow-none">
         <CardContent className="flex items-center justify-center h-full">
@@ -45,9 +45,10 @@ export const CreateTaskFormWrapper = ({
   }
 
   return (
-    <CreateTaskForm onCancel={onCancel}
-    projectOptions={projectOptions ?? []}
-    memberOptions={memberOptions ?? []}
+    <CreateTaskForm
+      onCancel={onCancel}
+      projectOptions={projectOptions ?? []}
+      memberOptions={memberOptions ?? []}
     />
-  )
+  );
 };
