@@ -1,15 +1,16 @@
+import { z } from "zod";
+import { Hono } from "hono";
+import { ID, Query } from "node-appwrite";
+
 import { sessionMiddleware } from "@/lib/session-middleware";
 import { zValidator } from "@hono/zod-validator";
-import { Hono } from "hono";
-import { createTaskSchema } from "../schemas";
 import { getMember } from "@/features/members/utils";
 import { DATABASE_ID, MEMBERS_ID, PROJECTS_ID, TASKS_ID } from "@/config";
-import { ID, Query } from "node-appwrite";
-import { z } from "zod";
-import { Task, TaskStatus } from "../types";
 import { createAdminClient } from "@/lib/appwrite";
 import { Project } from "@/features/projects/types";
-import { error } from "console";
+
+import { createTaskSchema } from "../schemas";
+import { Task, TaskStatus } from "../types";
 
 const app = new Hono()
   .delete("/:taskId", sessionMiddleware, async (c) => {
@@ -132,7 +133,7 @@ const app = new Hono()
 
           return {
             ...member,
-            name: user.name,
+            name: user.name || user.email,
             email: user.email,
           };
         })
@@ -296,7 +297,7 @@ const app = new Hono()
 
     const assignee = {
       ...member,
-      name: user.name,
+      name: user.name || user.email,
       email: user.email,
     };
 
@@ -348,6 +349,10 @@ const app = new Hono()
       }
 
       const workspaceId = workspaceIds.values().next().value as string;
+
+      if (!workspaceId) {
+        return c.json({ error: "Workspace ID is required" }, 400);
+      }
 
       const member = await getMember({
         databases,

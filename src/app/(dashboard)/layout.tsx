@@ -1,10 +1,10 @@
 import { CreateTaskModal } from "@/features/tasks/components/create-task-modal";
 import { CreateWorkspaceModal } from "@/features/workspaces/components/create-workspace-modal";
 import { CreateProjectModal } from "@/features/projects/components/create-project-modal";
+import { EditTaskModal } from "@/features/tasks/components/edit-task-modal";
 
 import { Navbar } from "@/components/navbar";
 import { Sidebar } from "@/components/sidebar";
-import { EditTaskModal } from "@/features/tasks/components/edit-task-modal";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;

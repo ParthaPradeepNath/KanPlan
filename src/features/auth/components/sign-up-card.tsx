@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { z } from "zod";
+import Link from "next/link";
 
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";

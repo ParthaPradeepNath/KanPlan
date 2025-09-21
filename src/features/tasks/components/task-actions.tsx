@@ -1,3 +1,9 @@
+import { useRouter } from "next/navigation";
+import { ExternalLinkIcon, PencilIcon, TrashIcon } from "lucide-react";
+
+import { useDeleteTask } from "@/features/tasks/api/use-delete-task";
+import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
+
 import { useConfirm } from "@/hooks/use-confirm";
 import {
   DropdownMenu,
@@ -5,11 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ExternalLinkIcon, PencilIcon, TrashIcon } from "lucide-react";
 
-import { useDeleteTask } from "@/features/tasks/api/use-delete-task";
-import { useRouter } from "next/navigation";
-import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
 import { useEditTaskModal } from "../hooks/use-edit-task-modal";
 
 interface TaskActionsProps {

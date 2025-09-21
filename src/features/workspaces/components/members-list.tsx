@@ -1,14 +1,19 @@
 "use client";
 
+import { Fragment } from "react";
+import Link from "next/link";
+import { ArrowLeftIcon, MoreVerticalIcon } from "lucide-react";
+
 import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
+import { useDeleteMember } from "@/features/members/api/use-delete-member";
+import { useUpdateMember } from "@/features/members/api/use-update-member";
+import { MemberRole } from "@/features/members/types";
+
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeftIcon, MoreVerticalIcon } from "lucide-react";
-import Link from "next/link";
 import { DottedSeparator } from "@/components/dotted-separator";
 import { useGetMembers } from "@/features/members/api/use-get-members";
-import { Fragment } from "react";
 import { MemberAvatar } from "@/features/members/components/member-avatar";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -17,9 +22,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useDeleteMember } from "@/features/members/api/use-delete-member";
-import { useUpdateMember } from "@/features/members/api/use-update-member";
-import { MemberRole } from "@/features/members/types";
+
 import { useConfirm } from "@/hooks/use-confirm";
 
 export const MembersList = () => {

@@ -2,10 +2,19 @@
 
 import { z } from "zod";
 import React, { useRef } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
+
 import { useForm } from "react-hook-form";
-import { updateProjectSchema } from "../schemas";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowLeftIcon, ImageIcon } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useConfirm } from "@/hooks/use-confirm";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { DottedSeparator } from "@/components/dotted-separator";
 import {
   Form,
   FormControl,
@@ -14,18 +23,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { DottedSeparator } from "@/components/dotted-separator";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ArrowLeftIcon, CopyIcon, ImageIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+import { updateProjectSchema } from "../schemas";
 import { Project } from "../types";
 import { useUpdateProject } from "../api/use-update-project";
-import { useConfirm } from "@/hooks/use-confirm";
-import { toast } from "sonner";
 import { useDeleteProject } from "../api/use-delete-project";
 
 interface EditProjectFormProps {
@@ -242,7 +244,7 @@ export const EditProjectForm = ({
               size="sm"
               variant="destructive"
               type="button"
-              disabled={isPending}
+              disabled={isPending || isDeletingProject}
               onClick={handleDelete}
             >
               Delete Project

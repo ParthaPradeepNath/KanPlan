@@ -1,7 +1,6 @@
 import { parseAsString, parseAsStringEnum, useQueryStates } from "nuqs";
 
 import { TaskStatus } from "../types";
-import { parse } from "path";
 
 export const useTaskFilters = () => {
     return useQueryStates({

@@ -1,5 +1,8 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 import { DottedSeparator } from "@/components/dotted-separator";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,11 +12,11 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import Link from "next/link";
+
 import { useJoinWorkspace } from "../api/use-join-workspace";
+
 import { useInviteCode } from "../hooks/use-invite-code";
 import { useWorkspaceId } from "../hooks/use-workspace-id";
-import { useRouter } from "next/navigation";
 
 interface JoinWorkspaceFormProps {
   initialValues: {

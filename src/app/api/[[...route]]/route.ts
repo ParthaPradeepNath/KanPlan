@@ -9,8 +9,13 @@ import tasks from "@/features/tasks/server/route";
 
 const app = new Hono().basePath("/api");
 
-const routes = app.route("/auth", auth).route("/workspaces", workspaces).route("/members", members)
-.route("/projects", projects).route("/tasks", tasks);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const routes = app
+  .route("/auth", auth)
+  .route("/workspaces", workspaces)
+  .route("/members", members)
+  .route("/projects", projects)
+  .route("/tasks", tasks);
 
 export const GET = handle(app);
 export const POST = handle(app);

@@ -1,11 +1,15 @@
 import { z } from "zod";
-import { sessionMiddleware } from "@/lib/session-middleware";
-import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
-import { createAdminClient } from "@/lib/appwrite";
-import { getMember } from "../utils";
-import { DATABASE_ID, MEMBERS_ID } from "@/config";
 import { Query } from "node-appwrite";
+
+import { zValidator } from "@hono/zod-validator";
+
+import { sessionMiddleware } from "@/lib/session-middleware";
+import { createAdminClient } from "@/lib/appwrite";
+
+import { DATABASE_ID, MEMBERS_ID } from "@/config";
+
+import { getMember } from "../utils";
 import { Member, MemberRole } from "../types";
 
 const app = new Hono()
@@ -36,7 +40,7 @@ const app = new Hono()
       const populatedMembers = await Promise.all(
         members.documents.map(async (member) => {
           const user = await users.get(member.userId);
-          return { ...member, name: user.name, email: user.email };
+          return { ...member, name: user.name || user.email, email: user.email };
         })
       );
 

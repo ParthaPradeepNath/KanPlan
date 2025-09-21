@@ -1,4 +1,5 @@
 import { ProjectAnalyticsResponseType } from "@/features/projects/api/use-get-project-analytics";
+
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 import { AnalyticsCard } from "./analytics-card";
 import { DottedSeparator } from "./dotted-separator";

@@ -1,6 +1,7 @@
 import { toast } from "sonner";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { InferRequestType, InferResponseType } from "hono";
+
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { client } from "@/lib/rpc";
 
@@ -8,7 +9,9 @@ type ResponseType = InferResponseType<
   (typeof client.api.tasks)["bulk-update"]["$post"],
   200
 >;
-type RequestType = InferRequestType<(typeof client.api.tasks)["bulk-update"]["$post"]>;
+type RequestType = InferRequestType<
+  (typeof client.api.tasks)["bulk-update"]["$post"]
+>;
 
 export const useBulkUpdateTasks = () => {
   const queryClient = useQueryClient();
@@ -25,7 +28,13 @@ export const useBulkUpdateTasks = () => {
     },
     onSuccess: () => {
       toast.success("Task updated");
-      // router.refresh();
+
+      queryClient.invalidateQueries({
+        queryKey: ["project-analytics"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["workspace-analytics"],
+      });
       queryClient.invalidateQueries({
         queryKey: ["tasks"],
       });

@@ -1,7 +1,8 @@
+import { redirect } from "next/navigation";
+
 import { getCurrent } from "@/features/auth/queries";
 import { JoinWorkspaceForm } from "@/features/workspaces/components/join-workspace-form";
 import { getWorkspaceInfo } from "@/features/workspaces/queries";
-import { redirect } from "next/navigation";
 
 interface WorkspaceIdJoinPageProps {
   params: {

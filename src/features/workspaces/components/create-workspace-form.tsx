@@ -2,11 +2,13 @@
 
 import { z } from "zod";
 import React, { useRef } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
 import { useForm } from "react-hook-form";
-import { createWorkspaceSchema } from "../schemas";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ImageIcon } from "lucide-react";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -18,12 +20,12 @@ import {
 import { DottedSeparator } from "@/components/dotted-separator";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useCreateWorkspace } from "../api/use-create-workspace";
-import Image from "next/image";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ImageIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+
+import { useCreateWorkspace } from "../api/use-create-workspace";
+import { createWorkspaceSchema } from "../schemas";
 
 interface CreateWorkspaceFormProps {
   onCancel?: () => void;
