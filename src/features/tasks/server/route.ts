@@ -207,7 +207,7 @@ const app = new Hono()
           status,
           workspaceId,
           projectId,
-          dueDate,
+          dueDate: dueDate ? dueDate.toISOString() : null,
           assigneeId,
           position: newPosition,
         }
@@ -251,7 +251,7 @@ const app = new Hono()
           name,
           status,
           projectId,
-          dueDate,
+          dueDate: dueDate ? dueDate.toISOString() : undefined,
           assigneeId,
           description,
         }
@@ -347,11 +347,11 @@ const app = new Hono()
         return c.json({ error: "All tasks must belong to the same workspace" });
       }
 
-      const workspaceId = workspaceIds.values().next().value;
+      const workspaceId = workspaceIds.values().next().value as string;
 
       const member = await getMember({
         databases,
-        workspaceId,
+        workspaceId: workspaceId,
         userId: user.$id,
       });
 
