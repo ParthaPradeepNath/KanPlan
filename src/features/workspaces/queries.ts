@@ -1,43 +1,54 @@
-import { Query } from 'node-appwrite'
+import 'server-only'
 
-import { createSessionClient } from '@/lib/appwrite'
-import { DATABASE_ID, MEMBERS_ID, WORKSPACES_ID } from '@/config'
+import { prisma } from '@/lib/prisma'
+import { getCurrent } from '@/features/auth/queries'
+
 import { Workspace } from './types'
-import { getMember } from '../members/utils'
+
+const serializeWorkspace = (workspace: {
+  id: string
+  name: string
+  imageUrl: string | null
+  inviteCode: string
+  userId: string
+  createdAt: Date
+  updatedAt: Date
+}): Workspace => ({
+  id: workspace.id,
+  name: workspace.name,
+  imageUrl: workspace.imageUrl ?? undefined,
+  inviteCode: workspace.inviteCode,
+  userId: workspace.userId,
+  createdAt: workspace.createdAt.toISOString(),
+  updatedAt: workspace.updatedAt.toISOString(),
+})
 
 export const getWorkspaces = async () => {
-  // const client = new Client()
-  //   .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
-  //   .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT!);
+  const user = await getCurrent()
 
-  // const session = (await cookies()).get(AUTH_COOKIE);
-
-  // if (!session) return { documents: [], total: 0 };
-
-  // client.setSession(session.value);
-
-  // const databases = new Databases(client);
-  // const account = new Account(client);
-
-  const { databases, account } = await createSessionClient()
-  const user = await account.get()
-
-  const members = await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
-    Query.equal('userId', user.$id),
-  ])
-
-  if (members.total === 0) {
+  if (!user) {
     return { documents: [], total: 0 }
   }
 
-  const workspaceIds = members.documents.map((member) => member.workspaceId)
+  const members = await prisma.member.findMany({
+    where: { userId: user.id },
+  })
 
-  const workspaces = await databases.listDocuments(DATABASE_ID, WORKSPACES_ID, [
-    Query.orderDesc('$createdAt'),
-    Query.contains('$id', workspaceIds),
-  ])
+  if (members.length === 0) {
+    return { documents: [], total: 0 }
+  }
 
-  return workspaces
+  const workspaceIds = members.map((member) => member.workspaceId)
+
+  const workspaces = await prisma.workspace.findMany({
+    where: { id: { in: workspaceIds } },
+    orderBy: { createdAt: 'desc' },
+  })
+
+  return {
+    documents: workspaces.map(serializeWorkspace),
+    total: workspaces.length,
+  }
 }
 
 interface GetWorkspaceProps {
@@ -46,26 +57,28 @@ interface GetWorkspaceProps {
 
 export const getWorkspace = async ({ workspaceId }: GetWorkspaceProps) => {
   try {
-    const { databases, account } = await createSessionClient()
-    const user = await account.get()
+    const user = await getCurrent()
 
-    const member = await getMember({
-      databases,
-      userId: user.$id,
-      workspaceId,
+    if (!user) {
+      return null
+    }
+
+    const member = await prisma.member.findFirst({
+      where: {
+        workspaceId,
+        userId: user.id,
+      },
     })
 
     if (!member) {
       return null
     }
 
-    const workspace = await databases.getDocument<Workspace>(
-      DATABASE_ID,
-      WORKSPACES_ID,
-      workspaceId
-    )
+    const workspace = await prisma.workspace.findUnique({
+      where: { id: workspaceId },
+    })
 
-    return workspace
+    return workspace ? serializeWorkspace(workspace) : null
   } catch {
     return null
   }
@@ -79,17 +92,20 @@ export const getWorkspaceInfo = async ({
   workspaceId,
 }: GetWorkspaceInfoProps) => {
   try {
-    const { databases } = await createSessionClient()
+    const workspace = await prisma.workspace.findUnique({
+      where: { id: workspaceId },
+      select: {
+        id: true,
+        name: true,
+        imageUrl: true,
+      },
+    })
 
-    const workspace = await databases.getDocument<Workspace>(
-      DATABASE_ID,
-      WORKSPACES_ID,
-      workspaceId
-    )
-
-    return {
-      name: workspace.name,
+    if (!workspace) {
+      return null
     }
+
+    return workspace
   } catch {
     return null
   }

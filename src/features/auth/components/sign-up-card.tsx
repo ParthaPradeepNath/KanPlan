@@ -19,6 +19,8 @@ import {
 import { Input } from '@/components/ui/input'
 import { zodResolver } from '@hookform/resolvers/zod'
 
+import { authClient } from '@/lib/auth-client'
+
 import {
   Form,
   FormControl,
@@ -126,6 +128,7 @@ export const SignUpCard = () => {
       </div>
       <CardContent className="flex flex-col gap-y-4 p-7">
         <Button
+          onClick={() => authClient.signIn.social({ provider: 'google' })}
           disabled={isPending}
           size="lg"
           className="w-full"
@@ -135,6 +138,7 @@ export const SignUpCard = () => {
           Login with Google
         </Button>
         <Button
+          onClick={() => authClient.signIn.social({ provider: 'github' })}
           disabled={isPending}
           size="lg"
           className="w-full"

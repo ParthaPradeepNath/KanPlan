@@ -35,8 +35,8 @@ import { useCreateTask } from '../api/use-create-task'
 
 interface CreateTaskFormProps {
   onCancel?: () => void
-  projectOptions: { id: string; name: string; imageUrl: string }[]
-  memberOptions: { id: string; name: string }[]
+  projectOptions: { id: string; name: string; imageUrl?: string }[]
+  memberOptions: { id: string; name?: string }[]
 }
 
 export const CreateTaskForm = ({

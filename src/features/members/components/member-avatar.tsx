@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
 
 interface MemberAvatarProps {
-  name: string
+  name?: string | null
   className?: string
   fallbackClassName?: string
 }
@@ -26,7 +26,7 @@ export const MemberAvatar = ({
           fallbackClassName
         )}
       >
-        {name.charAt(0).toUpperCase()}
+        {name?.charAt(0).toUpperCase()}
       </AvatarFallback>
     </Avatar>
   )

@@ -1,13 +1,10 @@
 import { z } from 'zod'
 import { Hono } from 'hono'
-import { Query } from 'node-appwrite'
 
 import { zValidator } from '@hono/zod-validator'
 
 import { sessionMiddleware } from '@/lib/session-middleware'
-import { createAdminClient } from '@/lib/appwrite'
-
-import { DATABASE_ID, MEMBERS_ID } from '@/config'
+import { prisma } from '@/lib/prisma'
 
 import { getMember } from '../utils'
 import { Member, MemberRole } from '../types'
@@ -18,38 +15,39 @@ const app = new Hono()
     sessionMiddleware,
     zValidator('query', z.object({ workspaceId: z.string() })),
     async (c) => {
-      const { users } = await createAdminClient()
-      const databases = c.get('databases')
       const user = c.get('user')
       const { workspaceId } = c.req.valid('query')
 
       const member = await getMember({
-        databases,
         workspaceId,
-        userId: user.$id,
+        userId: user.id,
       })
 
       if (!member) {
         return c.json({ error: 'Unauthorized' }, 401)
       }
 
-      const members = await databases.listDocuments<Member>(
-        DATABASE_ID,
-        MEMBERS_ID,
-        [Query.equal('workspaceId', workspaceId)]
-      )
+      const members = await prisma.member.findMany({
+        where: { workspaceId },
+        include: { user: true },
+        orderBy: { createdAt: 'desc' },
+      })
 
-      const populatedMembers = await Promise.all(
-        members.documents.map(async (member) => {
-          const user = await users.get(member.userId)
-          return { ...member, name: user.name || user.email, email: user.email }
-        })
-      )
+      const populatedMembers: Member[] = members.map((m) => ({
+        id: m.id,
+        workspaceId: m.workspaceId,
+        userId: m.userId,
+        role: m.role as MemberRole,
+        name: m.user.name || m.user.email,
+        email: m.user.email,
+        createdAt: m.createdAt.toISOString(),
+        updatedAt: m.updatedAt.toISOString(),
+      }))
 
       return c.json({
         data: {
-          ...members,
           documents: populatedMembers,
+          total: populatedMembers.length,
         },
       })
     }
@@ -57,41 +55,41 @@ const app = new Hono()
   .delete('/:memberId', sessionMiddleware, async (c) => {
     const { memberId } = c.req.param()
     const user = c.get('user')
-    const databases = c.get('databases')
 
-    const memberToDelete = await databases.getDocument(
-      DATABASE_ID,
-      MEMBERS_ID,
-      memberId
-    )
+    const memberToDelete = await prisma.member.findUnique({
+      where: { id: memberId },
+    })
 
-    const allMembersInWorkspace = await databases.listDocuments(
-      DATABASE_ID,
-      MEMBERS_ID,
-      [Query.equal('workspaceId', memberToDelete.workspaceId)]
-    )
+    if (!memberToDelete) {
+      return c.json({ error: 'Member not found' }, 404)
+    }
+
+    const allMembersInWorkspace = await prisma.member.count({
+      where: { workspaceId: memberToDelete.workspaceId },
+    })
 
     const member = await getMember({
-      databases,
       workspaceId: memberToDelete.workspaceId,
-      userId: user.$id,
+      userId: user.id,
     })
 
     if (!member) {
       return c.json({ error: 'Unauthorized' }, 401)
     }
 
-    if (member.$id !== memberToDelete.$id && member.role !== MemberRole.ADMIN) {
+    if (member.id !== memberToDelete.id && member.role !== MemberRole.ADMIN) {
       return c.json({ error: 'Unauthorized' }, 401)
     }
 
-    if (allMembersInWorkspace.total === 1) {
+    if (allMembersInWorkspace === 1) {
       return c.json({ error: 'Cannot delete the only member' }, 400)
     }
 
-    await databases.deleteDocument(DATABASE_ID, MEMBERS_ID, memberId)
+    await prisma.member.delete({
+      where: { id: memberId },
+    })
 
-    return c.json({ data: { $id: memberToDelete.$id } })
+    return c.json({ data: { id: memberToDelete.id } })
   })
   .patch(
     '/:memberId',
@@ -101,24 +99,22 @@ const app = new Hono()
       const { memberId } = c.req.param()
       const { role } = c.req.valid('json')
       const user = c.get('user')
-      const databases = c.get('databases')
 
-      const memberToUpdate = await databases.getDocument(
-        DATABASE_ID,
-        MEMBERS_ID,
-        memberId
-      )
+      const memberToUpdate = await prisma.member.findUnique({
+        where: { id: memberId },
+      })
 
-      const allMembersInWorkspace = await databases.listDocuments(
-        DATABASE_ID,
-        MEMBERS_ID,
-        [Query.equal('workspaceId', memberToUpdate.workspaceId)]
-      )
+      if (!memberToUpdate) {
+        return c.json({ error: 'Member not found' }, 404)
+      }
+
+      const allMembersInWorkspace = await prisma.member.count({
+        where: { workspaceId: memberToUpdate.workspaceId },
+      })
 
       const member = await getMember({
-        databases,
         workspaceId: memberToUpdate.workspaceId,
-        userId: user.$id,
+        userId: user.id,
       })
 
       if (!member) {
@@ -129,15 +125,16 @@ const app = new Hono()
         return c.json({ error: 'Unauthorized' }, 401)
       }
 
-      if (allMembersInWorkspace.total === 1) {
+      if (allMembersInWorkspace === 1) {
         return c.json({ error: 'Cannot downgrade the only member' }, 400)
       }
 
-      await databases.updateDocument(DATABASE_ID, MEMBERS_ID, memberId, {
-        role,
+      await prisma.member.update({
+        where: { id: memberId },
+        data: { role },
       })
 
-      return c.json({ data: { $id: memberToUpdate.$id } })
+      return c.json({ data: { id: memberToUpdate.id } })
     }
   )
 

@@ -86,8 +86,8 @@ export const TaskList = ({ data, total }: TaskListProps) => {
         <DottedSeparator className="my-4" />
         <ul className="flex flex-col gap-y-4">
           {data.map((task) => (
-            <li key={task.$id}>
-              <Link href={`/workspaces/${workspaceId}/tasks/${task.$id}`}>
+            <li key={task.id}>
+              <Link href={`/workspaces/${workspaceId}/tasks/${task.id}`}>
                 <Card className="rounded-lg shadow-none transition hover:opacity-75">
                   <CardContent className="p-4">
                     <p className="truncate text-lg font-medium">{task.name}</p>
@@ -97,7 +97,9 @@ export const TaskList = ({ data, total }: TaskListProps) => {
                       <div className="text-muted-foreground flex items-center text-sm">
                         <CalendarIcon className="truncate" />
                         <span className="mr-1 size-3">
-                          {formatDistanceToNow(new Date(task.dueDate))}
+                          {formatDistanceToNow(
+                            new Date(task.dueDate ?? '')
+                          )}
                         </span>
                       </div>
                     </div>
@@ -139,8 +141,8 @@ export const ProjectList = ({ data, total }: ProjectListProps) => {
         <DottedSeparator className="my-4" />
         <ul className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {data.map((project) => (
-            <li key={project.$id}>
-              <Link href={`/workspaces/${workspaceId}/projects/${project.$id}`}>
+            <li key={project.id}>
+              <Link href={`/workspaces/${workspaceId}/projects/${project.id}`}>
                 <Card className="rounded-lg shadow-none transition hover:opacity-75">
                   <CardContent className="flex items-center gap-x-1 p-4">
                     <ProjectAvatar
@@ -188,7 +190,7 @@ export const MembersList = ({ data, total }: MembersListProps) => {
         <DottedSeparator className="my-4" />
         <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {data.map((member) => (
-            <li key={member.$id}>
+            <li key={member.id}>
               <Card className="overflow-hidden rounded-lg shadow-none">
                 <CardContent className="flex flex-col items-center gap-x-2 p-3">
                   <MemberAvatar className="size-12" name={member.name ?? ''} />

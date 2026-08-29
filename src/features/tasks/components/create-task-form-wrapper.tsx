@@ -25,13 +25,13 @@ export const CreateTaskFormWrapper = ({
   })
 
   const projectOptions = projects?.documents.map((project) => ({
-    id: project.$id,
+    id: project.id,
     name: project.name,
     imageUrl: project.imageUrl,
   }))
 
   const memberOptions = members?.documents.map((project) => ({
-    id: project.$id,
+    id: project.id,
     name: project.name,
   }))
 

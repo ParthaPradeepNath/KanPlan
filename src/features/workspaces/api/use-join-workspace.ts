@@ -37,7 +37,7 @@ export const useJoinWorkspace = () => {
         queryKey: ['workspaces'],
       })
       queryClient.invalidateQueries({
-        queryKey: ['workspace', data.$id],
+        queryKey: ['workspace', data.id],
       })
     },
     onError: () => {

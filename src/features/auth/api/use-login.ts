@@ -1,27 +1,30 @@
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
-import { InferRequestType, InferResponseType } from 'hono'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-import { client } from '@/lib/rpc'
-
-type ResponseType = InferResponseType<(typeof client.api.auth.login)['$post']>
-type RequestType = InferRequestType<(typeof client.api.auth.login)['$post']>
+import { authClient } from '@/lib/auth-client'
 
 export const useLogin = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ json }) => {
-      const response = await client.api.auth.login['$post']({ json })
+  const mutation = useMutation({
+    mutationFn: async ({
+      json,
+    }: {
+      json: { email: string; password: string }
+    }) => {
+      const { error } = await authClient.signIn.email({
+        email: json.email,
+        password: json.password,
+      })
 
-      if (!response.ok) {
-        throw new Error('Failed to login')
+      if (error) {
+        throw new Error(error.message ?? 'Failed to login')
       }
 
-      return await response.json()
+      return { success: true }
     },
     onSuccess: () => {
       toast.success('Logged in')
@@ -34,13 +37,6 @@ export const useLogin = () => {
       toast.error('Failed to log in')
     },
   })
-
-  //   const mutation = useMutation({
-  //   mutationFn: async (data: { email: string; password: string }) => {
-  //     const response = await client.api.auth.login["$post"]({ json: data });
-  //     return await response.json();
-  //   },
-  // });
 
   return mutation
 }

@@ -14,7 +14,7 @@ import { useDeleteTask } from '../api/use-delete-task'
 import { Task } from '../types'
 
 interface TaskBreadcrumbsProps {
-  project: Project
+  project?: Project
   task: Task
 }
 
@@ -34,7 +34,7 @@ export const TaskBreadcrumbs = ({ project, task }: TaskBreadcrumbsProps) => {
     if (!ok) return
 
     mutate(
-      { param: { taskId: task.$id } },
+      { param: { taskId: task.id } },
       {
         onSuccess: () => {
           router.push(`/workspaces/${workspaceId}/tasks`)
@@ -46,17 +46,21 @@ export const TaskBreadcrumbs = ({ project, task }: TaskBreadcrumbsProps) => {
   return (
     <div className="flex items-center gap-x-2">
       <ConfirmDialog />
-      <ProjectAvatar
-        name={project.name}
-        image={project.imageUrl}
-        className="size-6 lg:size-8"
-      />
-      <Link href={`/workspaces/${workspaceId}/projects/${project.$id}`}>
-        <p className="text-muted-foreground text-sm font-semibold transition hover:opacity-75 lg:text-lg">
-          {project.name}
-        </p>
-      </Link>
-      <ChevronRightIcon className="text-muted-foreground size-4 lg:size-5" />
+      {project && (
+        <>
+          <ProjectAvatar
+            name={project.name}
+            image={project.imageUrl}
+            className="size-6 lg:size-8"
+          />
+          <Link href={`/workspaces/${workspaceId}/projects/${project.id}`}>
+            <p className="text-muted-foreground text-sm font-semibold transition hover:opacity-75 lg:text-lg">
+              {project.name}
+            </p>
+          </Link>
+          <ChevronRightIcon className="text-muted-foreground size-4 lg:size-5" />
+        </>
+      )}
       <p className="text-sm font-semibold lg:text-lg">{task.name}</p>
       <Button
         onClick={handleDeleteTask}

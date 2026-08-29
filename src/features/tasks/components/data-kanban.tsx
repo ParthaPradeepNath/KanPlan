@@ -46,7 +46,7 @@ const buildTasksState = (tasks: Task[]): TasksState => {
 interface DataKanbanProps {
   data: Task[]
   onChange: (
-    tasks: { $id: string; status: TaskStatus; position: number }[]
+    tasks: { id: string; status: TaskStatus; position: number }[]
   ) => void
 }
 
@@ -70,7 +70,7 @@ export const DataKanban = ({ data, onChange }: DataKanbanProps) => {
       const destStatus = destination.droppableId as TaskStatus
 
       let updatesPayload: {
-        $id: string
+        id: string
         status: TaskStatus
         position: number
       }[] = []
@@ -107,17 +107,17 @@ export const DataKanban = ({ data, onChange }: DataKanbanProps) => {
 
         // Always update the moved task
         updatesPayload.push({
-          $id: updatedMovedTask.$id,
+          id: updatedMovedTask.id,
           status: destStatus,
           position: Math.min((destination.index + 1) * 1000, 1_000_000),
         })
 
         //Update positions for affected tasks in the destination column
         newTasks[destStatus].forEach((task, index) => {
-          if (task && task.$id !== updatedMovedTask.$id) {
+          if (task && task.id !== updatedMovedTask.id) {
             const newPosition = Math.min((index + 1) * 1000, 1_000_000)
             updatesPayload.push({
-              $id: task.$id,
+              id: task.id,
               status: destStatus,
               position: newPosition,
             })
@@ -130,7 +130,7 @@ export const DataKanban = ({ data, onChange }: DataKanbanProps) => {
             if (task) {
               const newPosition = Math.min((index + 1) * 1000, 1_000_000)
               updatesPayload.push({
-                $id: task.$id,
+                id: task.id,
                 status: sourceStatus,
                 position: newPosition,
               })
@@ -168,8 +168,8 @@ export const DataKanban = ({ data, onChange }: DataKanbanProps) => {
                   >
                     {tasks[board].map((task, index) => (
                       <Draggable
-                        key={task.$id}
-                        draggableId={task.$id}
+                        key={task.id}
+                        draggableId={task.id}
                         index={index}
                       >
                         {(provided) => (

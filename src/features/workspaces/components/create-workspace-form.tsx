@@ -59,7 +59,7 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
           if (!data) return
 
           // Redirect to new workspace
-          router.push(`/workspaces/${data.$id}`)
+          router.push(`/workspaces/${data.id}`)
         },
       }
     )

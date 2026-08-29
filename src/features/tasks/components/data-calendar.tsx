@@ -69,18 +69,22 @@ const CustomToolbar = ({ date, onNavigate }: CustomToolbarProps) => {
 
 export const DataCalendar = ({ data }: DataCalendarProps) => {
   const [value, setValue] = useState(
-    data.length > 0 ? new Date(data[0].dueDate) : new Date()
+    data.length > 0 && data[0].dueDate
+      ? new Date(data[0].dueDate)
+      : new Date()
   )
 
-  const events = data.map((task) => ({
-    start: new Date(task.dueDate),
-    end: new Date(task.dueDate),
-    title: task.name,
-    project: task.project,
-    assignee: task.assignee,
-    status: task.status,
-    id: task.$id,
-  }))
+  const events = data
+    .filter((task) => task.dueDate)
+    .map((task) => ({
+      start: new Date(task.dueDate as string),
+      end: new Date(task.dueDate as string),
+      title: task.name,
+      project: task.project,
+      assignee: task.assignee,
+      status: task.status,
+      id: task.id,
+    }))
 
   const handleNavigate = (action: 'PREV' | 'NEXT' | 'TODAY') => {
     if (action === 'PREV') {

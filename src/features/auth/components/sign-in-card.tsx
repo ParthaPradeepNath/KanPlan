@@ -9,7 +9,7 @@ import { useForm } from 'react-hook-form'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 
-import { signUpWithGithub, signUpWithGoogle } from '@/lib/oauth'
+import { authClient } from '@/lib/auth-client'
 
 import { DottedSeparator } from '@/components/dotted-separator'
 import { Button } from '@/components/ui/button'
@@ -95,7 +95,7 @@ export const SignInCard = () => {
       </div>
       <CardContent className="flex flex-col gap-y-4 p-7">
         <Button
-          onClick={() => signUpWithGoogle()}
+          onClick={() => authClient.signIn.social({ provider: 'google' })}
           disabled={isPending}
           size="lg"
           className="w-full"
@@ -105,7 +105,7 @@ export const SignInCard = () => {
           Login with Google
         </Button>
         <Button
-          onClick={() => signUpWithGithub()}
+          onClick={() => authClient.signIn.social({ provider: 'github' })}
           disabled={isPending}
           size="lg"
           className="w-full"

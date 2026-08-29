@@ -3,11 +3,15 @@ import { differenceInDays, format } from 'date-fns'
 import { cn } from '@/lib/utils'
 
 interface TaskDateProps {
-  value: string
+  value?: string | null
   className?: string
 }
 
 export const TaskDate = ({ value, className }: TaskDateProps) => {
+  if (!value) {
+    return null
+  }
+
   const today = new Date()
   const endDate = new Date(value)
 

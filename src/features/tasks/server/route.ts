@@ -1,43 +1,82 @@
+import 'server-only'
+
 import { z } from 'zod'
 import { Hono } from 'hono'
-import { ID, Query } from 'node-appwrite'
+
+import { zValidator } from '@hono/zod-validator'
 
 import { sessionMiddleware } from '@/lib/session-middleware'
-import { zValidator } from '@hono/zod-validator'
+import { prisma } from '@/lib/prisma'
 import { getMember } from '@/features/members/utils'
-import { Member } from '@/features/members/types'
-import { DATABASE_ID, MEMBERS_ID, PROJECTS_ID, TASKS_ID } from '@/config'
-import { createAdminClient } from '@/lib/appwrite'
+import { Member, MemberRole } from '@/features/members/types'
 import { Project } from '@/features/projects/types'
 
 import { createTaskSchema } from '../schemas'
 import { Task, TaskStatus } from '../types'
 
+const serializeProject = (project: {
+  id: string
+  name: string
+  imageUrl: string | null
+  workspaceId: string
+  createdAt: Date
+  updatedAt: Date
+}): Project => ({
+  id: project.id,
+  name: project.name,
+  imageUrl: project.imageUrl ?? undefined,
+  workspaceId: project.workspaceId,
+  createdAt: project.createdAt.toISOString(),
+  updatedAt: project.updatedAt.toISOString(),
+})
+
+const serializeMember = (m: {
+  id: string
+  workspaceId: string
+  userId: string
+  role: string
+  createdAt: Date
+  updatedAt: Date
+  name?: string
+  email?: string
+}): Member => ({
+  id: m.id,
+  workspaceId: m.workspaceId,
+  userId: m.userId,
+  role: m.role as MemberRole,
+  name: m.name,
+  email: m.email,
+  createdAt: m.createdAt.toISOString(),
+  updatedAt: m.updatedAt.toISOString(),
+})
+
 const app = new Hono()
   .delete('/:taskId', sessionMiddleware, async (c) => {
     const user = c.get('user')
-    const databases = c.get('databases')
     const { taskId } = c.req.param()
 
-    const task = await databases.getDocument<Task>(
-      DATABASE_ID,
-      TASKS_ID,
-      taskId
-    )
+    const task = await prisma.task.findUnique({
+      where: { id: taskId },
+    })
+
+    if (!task) {
+      return c.json({ error: 'Task not found' }, 404)
+    }
 
     const member = await getMember({
-      databases,
       workspaceId: task.workspaceId,
-      userId: user.$id,
+      userId: user.id,
     })
 
     if (!member) {
       return c.json({ error: 'Unauthorized' }, 401)
     }
 
-    await databases.deleteDocument(DATABASE_ID, TASKS_ID, taskId)
+    await prisma.task.delete({
+      where: { id: taskId },
+    })
 
-    return c.json({ data: { $id: task.$id } })
+    return c.json({ data: { id: task.id } })
   })
   .get(
     '/',
@@ -54,112 +93,98 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const { users } = await createAdminClient()
-      const databases = c.get('databases')
       const user = c.get('user')
 
       const { workspaceId, projectId, status, assigneeId, search, dueDate } =
         c.req.valid('query')
 
       const member = await getMember({
-        databases,
         workspaceId,
-        userId: user.$id,
+        userId: user.id,
       })
 
       if (!member) {
         return c.json({ error: 'Unauthorized' }, 401)
       }
 
-      const query = [
-        Query.equal('workspaceId', workspaceId),
-        Query.orderDesc('$createdAt'),
-      ]
+      const where: Record<string, unknown> = {
+        workspaceId,
+      }
 
       if (projectId) {
-        console.log('projectId: ', projectId)
-        query.push(Query.equal('projectId', projectId))
+        where.projectId = projectId
       }
 
       if (status) {
-        console.log('status: ', status)
-        query.push(Query.equal('status', status))
-      }
-
-      if (projectId) {
-        console.log('projectId: ', projectId)
-        query.push(Query.equal('projectId', projectId))
+        where.status = status
       }
 
       if (assigneeId) {
-        console.log('assigneeId: ', assigneeId)
-        query.push(Query.equal('assigneeId', assigneeId))
+        where.assigneeId = assigneeId
       }
 
       if (dueDate) {
-        console.log('dueDate: ', dueDate)
-        query.push(Query.equal('dueDate', dueDate))
+        where.dueDate = new Date(dueDate)
       }
 
       if (search) {
-        console.log('search: ', search)
-        query.push(Query.search('search', search))
+        where.name = { contains: search, mode: 'insensitive' }
       }
 
-      const tasks = await databases.listDocuments<Task>(
-        DATABASE_ID,
-        TASKS_ID,
-        query
-      )
+      const tasks = await prisma.task.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+      })
 
-      const projectIds = tasks.documents.map((task) => task.projectId)
+      const projectIds = tasks.map((task) => task.projectId)
+      const assigneeIds = tasks.map((task) => task.assigneeId)
 
-      const assigneeIds = tasks.documents.map((task) => task.assigneeId)
+      const projects = await prisma.project.findMany({
+        where: { id: { in: projectIds } },
+      })
 
-      const projects = await databases.listDocuments<Project>(
-        DATABASE_ID,
-        PROJECTS_ID,
-        projectIds.length > 0 ? [Query.contains('$id', projectIds)] : []
-      )
+      const memberRecords = await prisma.member.findMany({
+        where: { id: { in: assigneeIds } },
+        include: { user: true },
+      })
 
-      const members = await databases.listDocuments<Member>(
-        DATABASE_ID,
-        MEMBERS_ID,
-        assigneeIds.length > 0 ? [Query.contains('$id', assigneeIds)] : []
-      )
-
-      const assignees = await Promise.all(
-        members.documents.map(async (member) => {
-          const user = await users.get(member.userId)
-
-          return {
-            ...member,
-            name: user.name || user.email,
-            email: user.email,
-          }
+      const assignees = memberRecords.map((m) =>
+        serializeMember({
+          ...m,
+          name: m.user.name || m.user.email,
+          email: m.user.email,
         })
       )
 
-      const populatedTasks = tasks.documents.map((task) => {
-        const project = projects.documents.find(
-          (project) => project.$id === task.projectId
+      const populatedTasks: Task[] = tasks.map((task) => {
+        const project = projects.find(
+          (p) => p.id === task.projectId
         )
-
         const assignee = assignees.find(
-          (assignee) => assignee.$id === task.assigneeId
+          (a) => a.id === task.assigneeId
         )
 
         return {
-          ...task,
-          project,
+          id: task.id,
+          name: task.name,
+          status: task.status as TaskStatus,
+          workspaceId: task.workspaceId,
+          assigneeId: task.assigneeId,
+          projectId: task.projectId,
+          position: task.position,
+          dueDate: task.dueDate ? task.dueDate.toISOString() : undefined,
+          description: task.description ?? undefined,
+          project: project ? serializeProject(project) : undefined,
           assignee,
+          createdAt: task.createdAt.toISOString(),
+          updatedAt: task.updatedAt.toISOString(),
         }
       })
 
       return c.json({
         data: {
-          ...tasks,
           documents: populatedTasks,
+          total: populatedTasks.length,
         },
       })
     }
@@ -170,52 +195,58 @@ const app = new Hono()
     zValidator('json', createTaskSchema),
     async (c) => {
       const user = c.get('user')
-      const databases = c.get('databases')
       const { name, status, workspaceId, projectId, dueDate, assigneeId } =
         c.req.valid('json')
 
       const member = await getMember({
-        databases,
         workspaceId,
-        userId: user.$id,
+        userId: user.id,
       })
 
       if (!member) {
         return c.json({ error: 'Unauthorized' }, 401)
       }
 
-      const highestPositionTask = await databases.listDocuments(
-        DATABASE_ID,
-        TASKS_ID,
-        [
-          Query.equal('status', status),
-          Query.equal('workspaceId', workspaceId),
-          Query.orderAsc('position'),
-          Query.limit(1),
-        ]
-      )
+      const highestPositionTask = await prisma.task.findFirst({
+        where: {
+          status,
+          workspaceId,
+        },
+        orderBy: { position: 'desc' },
+      })
 
       const newPosition =
-        highestPositionTask.documents.length > 0
-          ? highestPositionTask.documents[0].position + 1000
+        highestPositionTask && highestPositionTask.position
+          ? highestPositionTask.position + 1000
           : 1000
 
-      const task = await databases.createDocument(
-        DATABASE_ID,
-        TASKS_ID,
-        ID.unique(),
-        {
+      const task = await prisma.task.create({
+        data: {
           name,
           status,
           workspaceId,
           projectId,
-          dueDate: dueDate ? dueDate.toISOString() : null,
+          dueDate: dueDate ? new Date(dueDate) : null,
           assigneeId,
           position: newPosition,
-        }
-      )
+        },
+      })
 
-      return c.json({ data: task })
+      return c.json({
+        data: {
+          id: task.id,
+          name: task.name,
+          status: task.status as TaskStatus,
+          workspaceId: task.workspaceId,
+          assigneeId: task.assigneeId,
+          projectId: task.projectId,
+          position: task.position,
+          dueDate: task.dueDate ? task.dueDate.toISOString() : undefined,
+          description: task.description ?? undefined,
+          createdAt: task.createdAt.toISOString(),
+          updatedAt: task.updatedAt.toISOString(),
+        },
+      })
     }
   )
   .patch(
@@ -224,89 +255,109 @@ const app = new Hono()
     zValidator('json', createTaskSchema.partial()),
     async (c) => {
       const user = c.get('user')
-      const databases = c.get('databases')
       const { name, status, description, projectId, dueDate, assigneeId } =
         c.req.valid('json')
       const { taskId } = c.req.param()
 
-      const existingTask = await databases.getDocument<Task>(
-        DATABASE_ID,
-        TASKS_ID,
-        taskId
-      )
+      const existingTask = await prisma.task.findUnique({
+        where: { id: taskId },
+      })
+
+      if (!existingTask) {
+        return c.json({ error: 'Task not found' }, 404)
+      }
 
       const member = await getMember({
-        databases,
         workspaceId: existingTask.workspaceId,
-        userId: user.$id,
+        userId: user.id,
       })
 
       if (!member) {
         return c.json({ error: 'Unauthorized' }, 401)
       }
 
-      const task = await databases.updateDocument<Task>(
-        DATABASE_ID,
-        TASKS_ID,
-        taskId,
-        {
+      const task = await prisma.task.update({
+        where: { id: taskId },
+        data: {
           name,
           status,
           projectId,
-          dueDate: dueDate ? dueDate.toISOString() : undefined,
+          dueDate: dueDate ? new Date(dueDate) : undefined,
           assigneeId,
           description,
-        }
-      )
+        },
+      })
 
-      return c.json({ data: task })
+      return c.json({
+        data: {
+          id: task.id,
+          name: task.name,
+          status: task.status as TaskStatus,
+          workspaceId: task.workspaceId,
+          assigneeId: task.assigneeId,
+          projectId: task.projectId,
+          position: task.position,
+          dueDate: task.dueDate ? task.dueDate.toISOString() : undefined,
+          description: task.description ?? undefined,
+          createdAt: task.createdAt.toISOString(),
+          updatedAt: task.updatedAt.toISOString(),
+        },
+      })
     }
   )
   .get('/:taskId', sessionMiddleware, async (c) => {
     const currentUser = c.get('user')
-    const databases = c.get('databases')
-    const { users } = await createAdminClient()
     const { taskId } = c.req.param()
 
-    const task = await databases.getDocument<Task>(
-      DATABASE_ID,
-      TASKS_ID,
-      taskId
-    )
+    const task = await prisma.task.findUnique({
+      where: { id: taskId },
+    })
+
+    if (!task) {
+      return c.json({ error: 'Task not found' }, 404)
+    }
 
     const currentMember = await getMember({
-      databases,
       workspaceId: task.workspaceId,
-      userId: currentUser.$id,
+      userId: currentUser.id,
     })
 
     if (!currentMember) {
       return c.json({ error: 'Unauthorized' }, 401)
     }
-    const project = await databases.getDocument<Project>(
-      DATABASE_ID,
-      PROJECTS_ID,
-      task.projectId
-    )
-    const member = await databases.getDocument<Member>(
-      DATABASE_ID,
-      MEMBERS_ID,
-      task.assigneeId
-    )
 
-    const user = await users.get(member.userId)
+    const project = await prisma.project.findUnique({
+      where: { id: task.projectId },
+    })
 
-    const assignee = {
-      ...member,
-      name: user.name || user.email,
-      email: user.email,
-    }
+    const member = await prisma.member.findUnique({
+      where: { id: task.assigneeId },
+      include: { user: true },
+    })
+
+    const assignee = member
+      ? serializeMember({
+          ...member,
+          name: member.user.name || member.user.email,
+          email: member.user.email,
+        })
+      : undefined
 
     return c.json({
       data: {
-        ...task,
-        project,
+        id: task.id,
+        name: task.name,
+        status: task.status as TaskStatus,
+        workspaceId: task.workspaceId,
+        assigneeId: task.assigneeId,
+        projectId: task.projectId,
+        position: task.position,
+        dueDate: task.dueDate ? task.dueDate.toISOString() : undefined,
+        description: task.description ?? undefined,
+        project: project ? serializeProject(project) : undefined,
         assignee,
+        createdAt: task.createdAt.toISOString(),
+        updatedAt: task.updatedAt.toISOString(),
       },
     })
   })
@@ -318,7 +369,7 @@ const app = new Hono()
       z.object({
         tasks: z.array(
           z.object({
-            $id: z.string(),
+            id: z.string(),
             status: z.nativeEnum(TaskStatus),
             position: z.number().int().positive().min(1000).max(1_000_000),
           })
@@ -326,23 +377,17 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const databases = c.get('databases')
       const user = c.get('user')
-      const { tasks } = await c.req.valid('json')
+      const { tasks } = c.req.valid('json')
 
-      const tasksToUpdate = await databases.listDocuments<Task>(
-        DATABASE_ID,
-        TASKS_ID,
-        [
-          Query.contains(
-            '$id',
-            tasks.map((task) => task.$id)
-          ),
-        ]
-      )
+      const tasksToUpdate = await prisma.task.findMany({
+        where: {
+          id: { in: tasks.map((task) => task.id) },
+        },
+      })
 
       const workspaceIds = new Set(
-        tasksToUpdate.documents.map((task) => task.workspaceId)
+        tasksToUpdate.map((task) => task.workspaceId)
       )
 
       if (workspaceIds.size !== 1) {
@@ -356,25 +401,52 @@ const app = new Hono()
       }
 
       const member = await getMember({
-        databases,
-        workspaceId: workspaceId,
-        userId: user.$id,
+        workspaceId,
+        userId: user.id,
       })
 
       if (!member) {
         return c.json({ error: 'Unauthorized' }, 401)
       }
 
-      const updatedTasks = await Promise.all(
-        tasks.map(async (task) => {
-          const { $id, status, position } = task
-          return databases.updateDocument<Task>(DATABASE_ID, TASKS_ID, $id, {
-            status,
-            position,
-          })
+      const updatePromises = tasks.map(async (task) => {
+        const { id, status, position } = task
+        return prisma.task.update({
+          where: { id },
+          data: { status, position },
+          select: {
+            id: true,
+            name: true,
+            status: true,
+            workspaceId: true,
+            assigneeId: true,
+            projectId: true,
+            position: true,
+            dueDate: true,
+            description: true,
+            createdAt: true,
+            updatedAt: true,
+          },
         })
-      )
-      return c.json({ data: updatedTasks })
+      })
+
+      const updatedTasks = await Promise.all(updatePromises)
+
+      return c.json({
+        data: updatedTasks.map((task) => ({
+          id: task.id,
+          name: task.name,
+          status: task.status as TaskStatus,
+          workspaceId: task.workspaceId,
+          assigneeId: task.assigneeId,
+          projectId: task.projectId,
+          position: task.position,
+          dueDate: task.dueDate ? task.dueDate.toISOString() : undefined,
+          description: task.description ?? undefined,
+          createdAt: task.createdAt.toISOString(),
+          updatedAt: task.updatedAt.toISOString(),
+        })),
+      })
     }
   )
 

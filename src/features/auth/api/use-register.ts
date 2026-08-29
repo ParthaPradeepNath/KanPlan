@@ -1,36 +1,34 @@
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
-import { InferRequestType, InferResponseType } from 'hono'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-import { client } from '@/lib/rpc'
-
-type ResponseType = InferResponseType<
-  (typeof client.api.auth.register)['$post']
->
-type RequestType = InferRequestType<(typeof client.api.auth.register)['$post']>
+import { authClient } from '@/lib/auth-client'
 
 export const useRegister = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ json }) => {
-      const response = await client.api.auth.register['$post']({ json })
+  const mutation = useMutation({
+    mutationFn: async ({
+      json,
+    }: {
+      json: { name: string; email: string; password: string }
+    }) => {
+      const { error } = await authClient.signUp.email({
+        name: json.name,
+        email: json.email,
+        password: json.password,
+      })
 
-      if (!response.ok) {
-        throw new Error('Failed to register')
+      if (error) {
+        throw new Error(error.message ?? 'Failed to register')
       }
 
-      return await response.json()
+      return { success: true }
     },
     onSuccess: () => {
       toast.success('Registered')
-
-      // this is the brute force typr of doing it (clear all global states)
-      // window.location.reload()
-
       router.refresh()
       queryClient.invalidateQueries({
         queryKey: ['current'],

@@ -37,8 +37,8 @@ import { Task, TaskStatus } from '../types'
 
 interface EditTaskFormProps {
   onCancel?: () => void
-  projectOptions: { id: string; name: string; imageUrl: string }[]
-  memberOptions: { id: string; name: string }[]
+  projectOptions: { id: string; name: string; imageUrl?: string }[]
+  memberOptions: { id: string; name?: string }[]
   initialValues: Task
 }
 
@@ -92,7 +92,7 @@ export const EditTaskForm = ({
             ? new Date(values.dueDate as string | number | Date)
             : undefined,
         },
-        param: { taskId: initialValues.$id },
+        param: { taskId: initialValues.id },
       },
       {
         onSuccess: () => {

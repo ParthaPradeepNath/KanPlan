@@ -40,7 +40,7 @@ export const JoinWorkspaceForm = ({
       },
       {
         onSuccess: ({ data }) => {
-          router.push(`/workspaces/${data.$id}`)
+          router.push(`/workspaces/${data.id}`)
         },
       }
     )

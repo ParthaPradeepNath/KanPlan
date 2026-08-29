@@ -1,34 +1,55 @@
-import { createSessionClient } from '@/lib/appwrite'
+import 'server-only'
 
-import { DATABASE_ID, PROJECTS_ID } from '@/config'
+import { prisma } from '@/lib/prisma'
+import { getCurrent } from '@/features/auth/queries'
 
-import { getMember } from '../members/utils'
 import { Project } from './types'
+
+const serializeProject = (project: {
+  id: string
+  name: string
+  imageUrl: string | null
+  workspaceId: string
+  createdAt: Date
+  updatedAt: Date
+}): Project => ({
+  id: project.id,
+  name: project.name,
+  imageUrl: project.imageUrl ?? undefined,
+  workspaceId: project.workspaceId,
+  createdAt: project.createdAt.toISOString(),
+  updatedAt: project.updatedAt.toISOString(),
+})
 
 interface GetProjectProps {
   projectId: string
 }
 
 export const getProject = async ({ projectId }: GetProjectProps) => {
-  const { databases, account } = await createSessionClient()
+  const user = await getCurrent()
 
-  const user = await account.get()
+  if (!user) {
+    throw new Error('Unauthorized')
+  }
 
-  const project = await databases.getDocument<Project>(
-    DATABASE_ID,
-    PROJECTS_ID,
-    projectId
-  )
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+  })
 
-  const member = await getMember({
-    databases,
-    userId: user.$id,
-    workspaceId: project.workspaceId,
+  if (!project) {
+    throw new Error('Project not found')
+  }
+
+  const member = await prisma.member.findFirst({
+    where: {
+      workspaceId: project.workspaceId,
+      userId: user.id,
+    },
   })
 
   if (!member) {
     throw new Error('Unauthorized')
   }
 
-  return project
+  return serializeProject(project)
 }

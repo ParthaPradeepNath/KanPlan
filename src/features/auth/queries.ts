@@ -1,24 +1,21 @@
-import { createSessionClient } from '@/lib/appwrite'
+import 'server-only'
+
+import { headers } from 'next/headers'
+
+import { auth } from '@/lib/auth'
 
 export const getCurrent = async () => {
   try {
-    // const client = new Client()
-    //   .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
-    //   .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT!);
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    })
 
-    // const session = (await cookies()).get(AUTH_COOKIE);
+    if (!session) {
+      return null
+    }
 
-    // if (!session) return null;
-    // client.setSession(session.value)
-
-    // const account = new Account(client);
-
-    // this above code is just extracted in this below line(so much line code saved)
-    const { account } = await createSessionClient()
-
-    return await account.get()
+    return session.user
   } catch {
     return null
   }
-  // cant use re direct inside try-catch in NEXTJS
 }
