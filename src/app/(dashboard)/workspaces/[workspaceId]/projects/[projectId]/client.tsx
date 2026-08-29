@@ -1,36 +1,35 @@
-"use client";
+'use client'
 
-import Link from "next/link";
-import { PencilIcon } from "lucide-react";
+import Link from 'next/link'
+import { PencilIcon } from 'lucide-react'
 
-import { Analytics } from "@/components/analytics";
-import { PageError } from "@/components/page-error";
-import { PageLoader } from "@/components/page-loader";
-import { Button } from "@/components/ui/button";
+import { Analytics } from '@/components/analytics'
+import { PageError } from '@/components/page-error'
+import { PageLoader } from '@/components/page-loader'
+import { Button } from '@/components/ui/button'
 
-import { useGetProject } from "@/features/projects/api/use-get-project";
-import { useGetProjectAnalytics } from "@/features/projects/api/use-get-project-analytics";
-import { ProjectAvatar } from "@/features/projects/components/project-avatar";
-import { useProjectId } from "@/features/projects/hooks/use-project-id";
-import { TaskViewSwitcher } from "@/features/tasks/components/task-view-switcher";
-
+import { useGetProject } from '@/features/projects/api/use-get-project'
+import { useGetProjectAnalytics } from '@/features/projects/api/use-get-project-analytics'
+import { ProjectAvatar } from '@/features/projects/components/project-avatar'
+import { useProjectId } from '@/features/projects/hooks/use-project-id'
+import { TaskViewSwitcher } from '@/features/tasks/components/task-view-switcher'
 
 export const ProjectIdClient = () => {
-  const projectId = useProjectId();
+  const projectId = useProjectId()
   const { data: project, isLoading: isLoadingProject } = useGetProject({
     projectId,
-  });
+  })
   const { data: analytics, isLoading: isLoadingAnalytics } =
-    useGetProjectAnalytics({ projectId });
+    useGetProjectAnalytics({ projectId })
 
-  const isLoading = isLoadingProject || isLoadingAnalytics;
+  const isLoading = isLoadingProject || isLoadingAnalytics
 
   if (isLoading) {
-    return <PageLoader />;
+    return <PageLoader />
   }
 
   if (!project) {
-    return <PageError message="Project not found" />;
+    return <PageError message="Project not found" />
   }
 
   return (
@@ -49,7 +48,7 @@ export const ProjectIdClient = () => {
             <Link
               href={`/workspaces/${project.workspaceId}/projects/${project.$id}/settings`}
             >
-              <PencilIcon className="size-4 mr-2" />
+              <PencilIcon className="mr-2 size-4" />
               Edit Project
             </Link>
           </Button>
@@ -58,5 +57,5 @@ export const ProjectIdClient = () => {
       {analytics ? <Analytics data={analytics} /> : null}
       <TaskViewSwitcher hideProjectFilter />
     </div>
-  );
-};
+  )
+}

@@ -1,4 +1,4 @@
-import { createSessionClient } from "@/lib/appwrite";
+import { createSessionClient } from '@/lib/appwrite'
 
 export const getCurrent = async () => {
   try {
@@ -14,11 +14,11 @@ export const getCurrent = async () => {
     // const account = new Account(client);
 
     // this above code is just extracted in this below line(so much line code saved)
-    const { account } = await createSessionClient();
+    const { account } = await createSessionClient()
 
-    return await account.get();
+    return await account.get()
   } catch {
-    return null;
+    return null
   }
   // cant use re direct inside try-catch in NEXTJS
-};
+}

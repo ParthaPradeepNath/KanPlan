@@ -1,10 +1,10 @@
-"use client";
+'use client'
 
-import { z } from "zod";
-import { useForm } from "react-hook-form";
+import { z } from 'zod'
+import { useForm } from 'react-hook-form'
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Form,
   FormControl,
@@ -12,33 +12,31 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { DottedSeparator } from "@/components/dotted-separator";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
-import { DatePicker } from "@/components/date-picker";
+} from '@/components/ui/form'
+import { DottedSeparator } from '@/components/dotted-separator'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { useWorkspaceId } from '@/features/workspaces/hooks/use-workspace-id'
+import { DatePicker } from '@/components/date-picker'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { MemberAvatar } from "@/features/members/components/member-avatar";
-import { ProjectAvatar } from "@/features/projects/components/project-avatar";
+} from '@/components/ui/select'
+import { MemberAvatar } from '@/features/members/components/member-avatar'
+import { ProjectAvatar } from '@/features/projects/components/project-avatar'
 
-
-import { createTaskSchema } from "../schemas";
-import { TaskStatus } from "../types";
-import { useCreateTask } from "../api/use-create-task";
-
+import { createTaskSchema } from '../schemas'
+import { TaskStatus } from '../types'
+import { useCreateTask } from '../api/use-create-task'
 
 interface CreateTaskFormProps {
-  onCancel?: () => void;
-  projectOptions: { id: string; name: string; imageUrl: string }[];
-  memberOptions: { id: string; name: string }[];
+  onCancel?: () => void
+  projectOptions: { id: string; name: string; imageUrl: string }[]
+  memberOptions: { id: string; name: string }[]
 }
 
 export const CreateTaskForm = ({
@@ -46,25 +44,25 @@ export const CreateTaskForm = ({
   projectOptions,
   memberOptions,
 }: CreateTaskFormProps) => {
-  const workspaceId = useWorkspaceId();
-  const { mutate, isPending } = useCreateTask();
+  const workspaceId = useWorkspaceId()
+  const { mutate, isPending } = useCreateTask()
 
   // Use unknown for dueDate to match zod's .coerce.date() input
-  type RawTaskForm = Omit<z.infer<typeof createTaskSchema>, "dueDate"> & {
-    dueDate: unknown;
-  };
+  type RawTaskForm = Omit<z.infer<typeof createTaskSchema>, 'dueDate'> & {
+    dueDate: unknown
+  }
   const form = useForm<RawTaskForm>({
     resolver: zodResolver(createTaskSchema),
     defaultValues: {
-      name: "",
+      name: '',
       status: TaskStatus.BACKLOG,
-      workspaceId: workspaceId || "",
-      projectId: projectOptions[0]?.id || "",
+      workspaceId: workspaceId || '',
+      projectId: projectOptions[0]?.id || '',
       dueDate: new Date(),
-      assigneeId: memberOptions[0]?.id || "",
-      description: "",
+      assigneeId: memberOptions[0]?.id || '',
+      description: '',
     },
-  });
+  })
 
   const onSubmit = (values: RawTaskForm) => {
     // zod will coerce dueDate to Date, but ensure it's a Date for API
@@ -78,15 +76,15 @@ export const CreateTaskForm = ({
       },
       {
         onSuccess: () => {
-          form.reset();
-          onCancel?.();
+          form.reset()
+          onCancel?.()
         },
       }
-    );
-  };
+    )
+  }
 
   return (
-    <Card className="w-full h-full border-none shadow-none">
+    <Card className="h-full w-full border-none shadow-none">
       <CardHeader className="flex p-7">
         <CardTitle className="text-xl font-bold">Create a new task</CardTitle>
       </CardHeader>
@@ -270,7 +268,7 @@ export const CreateTaskForm = ({
                 variant="secondary"
                 onClick={onCancel}
                 disabled={isPending}
-                className={cn(!onCancel && "invisible")}
+                className={cn(!onCancel && 'invisible')}
               >
                 Cancel
               </Button>
@@ -282,5 +280,5 @@ export const CreateTaskForm = ({
         </Form>
       </CardContent>
     </Card>
-  );
-};
+  )
+}

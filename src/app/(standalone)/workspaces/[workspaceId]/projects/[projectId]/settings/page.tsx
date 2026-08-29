@@ -1,16 +1,16 @@
-import { redirect } from "next/navigation";
+import { redirect } from 'next/navigation'
 
-import { getCurrent } from "@/features/auth/queries";
+import { getCurrent } from '@/features/auth/queries'
 
-import { ProjectIdSettingsClient } from "./client";
+import { ProjectIdSettingsClient } from './client'
 
 const ProjectIdSettingsPage = async () => {
-  const user = await getCurrent();
+  const user = await getCurrent()
   if (!user) {
-    redirect("/sign-in");
+    redirect('/sign-in')
   }
 
-  return <ProjectIdSettingsClient />;
-};
+  return <ProjectIdSettingsClient />
+}
 
-export default ProjectIdSettingsPage;
+export default ProjectIdSettingsPage

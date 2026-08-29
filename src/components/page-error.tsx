@@ -1,16 +1,16 @@
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle } from 'lucide-react'
 
 interface PageErrorProps {
-  message: string;
+  message: string
 }
 
 export const PageError = ({
-  message = "Something went wrong",
+  message = 'Something went wrong',
 }: PageErrorProps) => {
   return (
-    <div className="h-full flex flex-col items-center justify-center">
-      <AlertTriangle className="size-6 text-muted-foreground mb-2" />
-      <p className="text-sm text-muted-foreground">{message}</p>
+    <div className="flex h-full flex-col items-center justify-center">
+      <AlertTriangle className="text-muted-foreground mb-2 size-6" />
+      <p className="text-muted-foreground text-sm">{message}</p>
     </div>
-  );
-};
+  )
+}

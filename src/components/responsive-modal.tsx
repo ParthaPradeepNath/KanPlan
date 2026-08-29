@@ -38,37 +38,37 @@
 //   );
 // };
 
-import { useMedia } from "react-use";
+import { useMedia } from 'react-use'
 
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog'
 
-import { Drawer, DrawerContent } from "@/components/ui/drawer";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { Drawer, DrawerContent } from '@/components/ui/drawer'
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 
 interface ResponsiveModalProps {
-  children: React.ReactNode;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  title?: string; // optional title for accessibility
+  children: React.ReactNode
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  title?: string // optional title for accessibility
 }
 
 export const ResponsiveModal = ({
   children,
   open,
   onOpenChange,
-  title = "Modal", // fallback if no title provided
+  title = 'Modal', // fallback if no title provided
 }: ResponsiveModalProps) => {
-  const isDesktop = useMedia("(min-width: 1024px)", true);
+  const isDesktop = useMedia('(min-width: 1024px)', true)
 
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="w-full sm:max-w-lg p-0 border-none overflow-y-auto hide-scrollbar max-h-[85vh]">
+        <DialogContent className="hide-scrollbar max-h-[85vh] w-full overflow-y-auto border-none p-0 sm:max-w-lg">
           <DialogHeader>
             {/* Hide the title visually if you don’t want it shown */}
             <VisuallyHidden>
@@ -78,16 +78,16 @@ export const ResponsiveModal = ({
           {children}
         </DialogContent>
       </Dialog>
-    );
+    )
   }
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent>
-        <div className="overflow-y-auto hide-scrollbar max-h-[85vh]">
+        <div className="hide-scrollbar max-h-[85vh] overflow-y-auto">
           {children}
         </div>
       </DrawerContent>
     </Drawer>
-  );
-};
+  )
+}

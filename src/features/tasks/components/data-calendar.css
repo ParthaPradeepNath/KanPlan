@@ -1,5 +1,5 @@
 .rbc-month-row {
-    @apply min-h-[180px] border-t border-x;
+  @apply min-h-[180px] border-x border-t;
 }
 /*
 .rbc-header + .rbc-header {

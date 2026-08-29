@@ -1,13 +1,13 @@
-import Image from "next/image";
+import Image from 'next/image'
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils'
 
 interface WorkspaceAvatarProps {
-  image?: string;
-  name: string;
-  className?: string;
+  image?: string
+  name: string
+  className?: string
 }
 
 export const WorkspaceAvatar = ({
@@ -18,18 +18,18 @@ export const WorkspaceAvatar = ({
   if (image) {
     return (
       <div
-        className={cn("size-10 relative rounded-md overflow-hidden", className)}
+        className={cn('relative size-10 overflow-hidden rounded-md', className)}
       >
         <Image src={image} alt={name} fill className="object-cover" />
       </div>
-    );
+    )
   }
 
   return (
-    <Avatar className={cn("size-10 rounded-md", className)}>
-      <AvatarFallback className="text-white bg-blue-600 font-semibold text-lg uppercase rounded-md">
+    <Avatar className={cn('size-10 rounded-md', className)}>
+      <AvatarFallback className="rounded-md bg-blue-600 text-lg font-semibold text-white uppercase">
         {name[0]}
       </AvatarFallback>
     </Avatar>
-  );
-};
+  )
+}

@@ -1,16 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from '@tanstack/react-query'
 
-import { client } from "@/lib/rpc";
+import { client } from '@/lib/rpc'
 
-import { TaskStatus } from "../types";
+import { TaskStatus } from '../types'
 
 interface UseGetTasksProps {
-  workspaceId: string;
-  projectId?: string | null;
-  status?: TaskStatus | null;
-  search?: string | null;
-  assigneeId?: string | null;
-  dueDate?: string | null;
+  workspaceId: string
+  projectId?: string | null
+  status?: TaskStatus | null
+  search?: string | null
+  assigneeId?: string | null
+  dueDate?: string | null
 }
 
 export const useGetTasks = ({
@@ -23,7 +23,7 @@ export const useGetTasks = ({
 }: UseGetTasksProps) => {
   const query = useQuery({
     queryKey: [
-      "tasks",
+      'tasks',
       workspaceId,
       projectId,
       status,
@@ -41,16 +41,16 @@ export const useGetTasks = ({
           assigneeId: assigneeId ?? undefined,
           dueDate: dueDate ?? undefined,
         },
-      });
+      })
 
       if (!response.ok) {
-        throw new Error("Failed to fetch tasks");
+        throw new Error('Failed to fetch tasks')
       }
 
-      const { data } = await response.json();
+      const { data } = await response.json()
 
-      return data;
+      return data
     },
-  });
-  return query;
-};
+  })
+  return query
+}

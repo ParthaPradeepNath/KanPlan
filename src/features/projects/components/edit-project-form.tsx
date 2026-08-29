@@ -1,20 +1,20 @@
-"use client";
+'use client'
 
-import { z } from "zod";
-import React, { useRef } from "react";
-import Image from "next/image";
+import { z } from 'zod'
+import React, { useRef } from 'react'
+import Image from 'next/image'
 
-import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeftIcon, ImageIcon } from "lucide-react";
+import { useForm } from 'react-hook-form'
+import { useRouter } from 'next/navigation'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { ArrowLeftIcon, ImageIcon } from 'lucide-react'
 
-import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useConfirm } from "@/hooks/use-confirm";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { DottedSeparator } from "@/components/dotted-separator";
+import { cn } from '@/lib/utils'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { useConfirm } from '@/hooks/use-confirm'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { DottedSeparator } from '@/components/dotted-separator'
 import {
   Form,
   FormControl,
@@ -22,48 +22,48 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+} from '@/components/ui/form'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-import { updateProjectSchema } from "../schemas";
-import { Project } from "../types";
-import { useUpdateProject } from "../api/use-update-project";
-import { useDeleteProject } from "../api/use-delete-project";
+import { updateProjectSchema } from '../schemas'
+import { Project } from '../types'
+import { useUpdateProject } from '../api/use-update-project'
+import { useDeleteProject } from '../api/use-delete-project'
 
 interface EditProjectFormProps {
-  onCancel?: () => void;
-  initialValues: Project;
+  onCancel?: () => void
+  initialValues: Project
 }
 
 export const EditProjectForm = ({
   onCancel,
   initialValues,
 }: EditProjectFormProps) => {
-  const router = useRouter();
-  const { mutate, isPending } = useUpdateProject();
+  const router = useRouter()
+  const { mutate, isPending } = useUpdateProject()
   const { mutate: deleteProject, isPending: isDeletingProject } =
-    useDeleteProject();
+    useDeleteProject()
 
   const [DeleteDialog, confirmDelete] = useConfirm(
-    "Delete Project",
-    "This action cannot be undone.",
-    "destructive"
-  );
+    'Delete Project',
+    'This action cannot be undone.',
+    'destructive'
+  )
 
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const form = useForm<z.infer<typeof updateProjectSchema>>({
     resolver: zodResolver(updateProjectSchema),
     defaultValues: {
       ...initialValues,
-      image: initialValues.imageUrl ?? "",
+      image: initialValues.imageUrl ?? '',
     },
-  });
+  })
 
   const handleDelete = async () => {
-    const ok = await confirmDelete();
+    const ok = await confirmDelete()
 
-    if (!ok) return;
+    if (!ok) return
 
     // console.log("deleting...");
 
@@ -71,32 +71,32 @@ export const EditProjectForm = ({
       { param: { projectId: initialValues.$id } },
       {
         onSuccess: () => {
-          window.location.href = `/workspaces/${initialValues.workspaceId}`;
+          router.push(`/workspaces/${initialValues.workspaceId}`)
         },
       }
-    );
-  };
+    )
+  }
 
   const onSubmit = (values: z.infer<typeof updateProjectSchema>) => {
     const finalValues = {
       ...values,
-      image: values.image instanceof File ? values.image : "",
-    };
-    mutate({ form: finalValues, param: { projectId: initialValues.$id } });
-  };
+      image: values.image instanceof File ? values.image : '',
+    }
+    mutate({ form: finalValues, param: { projectId: initialValues.$id } })
+  }
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0]
     if (file) {
-      form.setValue("image", file);
+      form.setValue('image', file)
     }
-  };
+  }
 
   return (
     <div className="flex flex-col gap-y-4">
       <DeleteDialog />
-      <Card className="w-full h-full border-none shadow-none">
-        <CardHeader className="flex flex-row items-centergap-x-4 p-7 space-y-0">
+      <Card className="h-full w-full border-none shadow-none">
+        <CardHeader className="items-centergap-x-4 flex flex-row space-y-0 p-7">
           <Button
             size="sm"
             variant="secondary"
@@ -109,7 +109,7 @@ export const EditProjectForm = ({
                     )
             }
           >
-            <ArrowLeftIcon className="size-4 mr-2" />
+            <ArrowLeftIcon className="mr-2 size-4" />
             Back
           </Button>
           <CardTitle className="text-xl font-bold">
@@ -143,7 +143,7 @@ export const EditProjectForm = ({
                     <div className="flex flex-col gap-y-2">
                       <div className="flex items-center gap-x-5">
                         {field.value ? (
-                          <div className="size-[72px] relative rounded-md overflow-hidden">
+                          <div className="relative size-[72px] overflow-hidden rounded-md">
                             <Image
                               alt="logo"
                               fill
@@ -181,7 +181,7 @@ export const EditProjectForm = ({
                               disabled={isPending}
                               variant="destructive"
                               size="xs"
-                              className="w-fit mt-2"
+                              className="mt-2 w-fit"
                               onClick={() => inputRef.current?.click()}
                             >
                               Remove Image
@@ -192,11 +192,11 @@ export const EditProjectForm = ({
                               disabled={isPending}
                               variant="teritary"
                               size="xs"
-                              className="w-fit mt-2"
+                              className="mt-2 w-fit"
                               onClick={() => {
-                                field.onChange(null);
+                                field.onChange(null)
                                 if (inputRef.current) {
-                                  inputRef.current.value = "";
+                                  inputRef.current.value = ''
                                 }
                               }}
                             >
@@ -217,7 +217,7 @@ export const EditProjectForm = ({
                   variant="secondary"
                   onClick={onCancel}
                   disabled={isPending}
-                  className={cn(!onCancel && "invisible")}
+                  className={cn(!onCancel && 'invisible')}
                 >
                   Cancel
                 </Button>
@@ -230,17 +230,17 @@ export const EditProjectForm = ({
         </CardContent>
       </Card>
 
-      <Card className="w-full h-full border-none shadow-none">
+      <Card className="h-full w-full border-none shadow-none">
         <CardContent className="p-7">
           <div className="flex flex-col">
             <h3 className="font-bold">Danger Zone</h3>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Deleting a project is irreversible and will remove all associated
               data.
             </p>
             <DottedSeparator className="py-7" />
             <Button
-              className="mt-6 w-fit ml-auto"
+              className="mt-6 ml-auto w-fit"
               size="sm"
               variant="destructive"
               type="button"
@@ -253,5 +253,5 @@ export const EditProjectForm = ({
         </CardContent>
       </Card>
     </div>
-  );
-};
+  )
+}

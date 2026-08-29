@@ -1,50 +1,50 @@
-"use client";
+'use client'
 
-import { z } from "zod";
-import Link from "next/link";
+import { z } from 'zod'
+import Link from 'next/link'
 
-import { FcGoogle } from "react-icons/fc";
-import { FaGithub } from "react-icons/fa";
-import { useForm } from "react-hook-form";
+import { FcGoogle } from 'react-icons/fc'
+import { FaGithub } from 'react-icons/fa'
+import { useForm } from 'react-hook-form'
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { zodResolver } from '@hookform/resolvers/zod'
 
-import { signUpWithGithub, signUpWithGoogle } from "@/lib/oauth";
+import { signUpWithGithub, signUpWithGoogle } from '@/lib/oauth'
 
-import { DottedSeparator } from "@/components/dotted-separator";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { DottedSeparator } from '@/components/dotted-separator'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from "@/components/ui/form";
+} from '@/components/ui/form'
 
-import { loginSchema } from "../schemas";
-import { useLogin } from "../api/use-login";
+import { loginSchema } from '../schemas'
+import { useLogin } from '../api/use-login'
 
 export const SignInCard = () => {
-  const { mutate, isPending } = useLogin();
+  const { mutate, isPending } = useLogin()
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
-  });
+  })
 
   const onSubmit = (values: z.infer<typeof loginSchema>) => {
-    mutate({ json: values });
-  };
+    mutate({ json: values })
+  }
 
   return (
-    <Card className="w-full h-full md:w-[487px] border-none shadow-none">
-      <CardHeader className="flex items-center justify-center text-center p-7">
-        <CardTitle className="text-2xl ">Welcome Back!</CardTitle>
+    <Card className="h-full w-full border-none shadow-none md:w-[487px]">
+      <CardHeader className="flex items-center justify-center p-7 text-center">
+        <CardTitle className="text-2xl">Welcome Back!</CardTitle>
       </CardHeader>
       <div className="px-7">
         <DottedSeparator />
@@ -93,7 +93,7 @@ export const SignInCard = () => {
       <div className="px-7">
         <DottedSeparator />
       </div>
-      <CardContent className="p-7 flex flex-col gap-y-4">
+      <CardContent className="flex flex-col gap-y-4 p-7">
         <Button
           onClick={() => signUpWithGoogle()}
           disabled={isPending}
@@ -118,7 +118,7 @@ export const SignInCard = () => {
       <div className="px-7">
         <DottedSeparator />
       </div>
-      <CardContent className="p-7 flex items-center justify-center">
+      <CardContent className="flex items-center justify-center p-7">
         <p>
           Don&apos;t have an account?
           <Link href="/sign-up">
@@ -127,5 +127,5 @@ export const SignInCard = () => {
         </p>
       </CardContent>
     </Card>
-  );
-};
+  )
+}

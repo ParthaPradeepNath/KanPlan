@@ -1,36 +1,36 @@
-"use client";
+'use client'
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
-import { DottedSeparator } from "@/components/dotted-separator";
-import { Button } from "@/components/ui/button";
+import { DottedSeparator } from '@/components/dotted-separator'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
   CardDescription,
-} from "@/components/ui/card";
+} from '@/components/ui/card'
 
-import { useJoinWorkspace } from "../api/use-join-workspace";
+import { useJoinWorkspace } from '../api/use-join-workspace'
 
-import { useInviteCode } from "../hooks/use-invite-code";
-import { useWorkspaceId } from "../hooks/use-workspace-id";
+import { useInviteCode } from '../hooks/use-invite-code'
+import { useWorkspaceId } from '../hooks/use-workspace-id'
 
 interface JoinWorkspaceFormProps {
   initialValues: {
-    name: string;
-  };
+    name: string
+  }
 }
 
 export const JoinWorkspaceForm = ({
   initialValues,
 }: JoinWorkspaceFormProps) => {
-  const router = useRouter();
-  const workspaceId = useWorkspaceId();
-  const inviteCode = useInviteCode();
-  const { mutate, isPending } = useJoinWorkspace();
+  const router = useRouter()
+  const workspaceId = useWorkspaceId()
+  const inviteCode = useInviteCode()
+  const { mutate, isPending } = useJoinWorkspace()
 
   const onSubmit = () => {
     mutate(
@@ -40,26 +40,26 @@ export const JoinWorkspaceForm = ({
       },
       {
         onSuccess: ({ data }) => {
-          router.push(`/workspaces/${data.$id}`);
+          router.push(`/workspaces/${data.$id}`)
         },
       }
-    );
-  };
+    )
+  }
 
   return (
-    <Card className="w-full h-full border-none shadow-none">
+    <Card className="h-full w-full border-none shadow-none">
       <CardHeader className="p-7">
         <CardTitle className="text-xl font-bold">Join Workspace</CardTitle>
         <CardDescription>
-          You&apos;ve been invited to join a <strong>{initialValues.name}</strong>{" "}
-          workspace.
+          You&apos;ve been invited to join a{' '}
+          <strong>{initialValues.name}</strong> workspace.
         </CardDescription>
       </CardHeader>
       <div className="px-7">
         <DottedSeparator />
       </div>
       <CardContent className="p-7">
-        <div className="flex flex-col lg:flex-row gap-2 items-center justify-between">
+        <div className="flex flex-col items-center justify-between gap-2 lg:flex-row">
           <Button
             variant="secondary"
             type="button"
@@ -82,5 +82,5 @@ export const JoinWorkspaceForm = ({
         </div>
       </CardContent>
     </Card>
-  );
-};
+  )
+}

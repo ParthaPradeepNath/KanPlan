@@ -1,24 +1,24 @@
-import { useState } from "react";
+import { useState } from 'react'
 
-import { PencilIcon, XIcon } from "lucide-react";
+import { PencilIcon, XIcon } from 'lucide-react'
 
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { DottedSeparator } from "@/components/dotted-separator";
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import { DottedSeparator } from '@/components/dotted-separator'
 
-import { Task } from "../types";
+import { Task } from '../types'
 
-import { useUpdateTask } from "../api/use-update-task";
+import { useUpdateTask } from '../api/use-update-task'
 
 interface TaskDescriptionProps {
-  task: Task;
+  task: Task
 }
 
 export const TaskDescription = ({ task }: TaskDescriptionProps) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [value, setValue] = useState(task.description);
+  const [isEditing, setIsEditing] = useState(false)
+  const [value, setValue] = useState(task.description)
 
-  const { mutate, isPending } = useUpdateTask();
+  const { mutate, isPending } = useUpdateTask()
 
   const handleSave = () => {
     mutate(
@@ -28,14 +28,14 @@ export const TaskDescription = ({ task }: TaskDescriptionProps) => {
       },
       {
         onSuccess: () => {
-          setIsEditing(false);
+          setIsEditing(false)
         },
       }
-    );
-  };
+    )
+  }
 
   return (
-    <div className="p-4 border rounded-lg">
+    <div className="rounded-lg border p-4">
       <div className="flex items-center justify-between">
         <p className="text-lg font-semibold">Overview</p>
         <Button
@@ -44,11 +44,11 @@ export const TaskDescription = ({ task }: TaskDescriptionProps) => {
           variant="secondary"
         >
           {isEditing ? (
-            <XIcon className="size-4 mr-2" />
+            <XIcon className="mr-2 size-4" />
           ) : (
-            <PencilIcon className="size-4 mr-2" />
+            <PencilIcon className="mr-2 size-4" />
           )}
-          {isEditing ? "Cancel" : "Edit"}
+          {isEditing ? 'Cancel' : 'Edit'}
         </Button>
       </div>
       <DottedSeparator className="my-4" />
@@ -63,11 +63,11 @@ export const TaskDescription = ({ task }: TaskDescriptionProps) => {
           />
           <Button
             size="sm"
-            className="w-fit ml-auto"
+            className="ml-auto w-fit"
             onClick={handleSave}
             disabled={isPending}
           >
-            {isPending ? "Saving..." : "Save Changes"}
+            {isPending ? 'Saving...' : 'Save Changes'}
           </Button>
         </div>
       ) : (
@@ -78,5 +78,5 @@ export const TaskDescription = ({ task }: TaskDescriptionProps) => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}

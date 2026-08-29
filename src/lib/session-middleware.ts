@@ -1,4 +1,4 @@
-import "server-only";
+import 'server-only'
 
 import {
   Account,
@@ -9,35 +9,35 @@ import {
   type Account as AccountType,
   type Databases as DatabasesType,
   type Storage as StorageType,
-  type Models as ModelsType,
   type Users as UsersType,
-} from "node-appwrite";
+} from 'node-appwrite'
 
-import { getCookie } from "hono/cookie";
-import { createMiddleware } from "hono/factory";
+import { getCookie } from 'hono/cookie'
+import { createMiddleware } from 'hono/factory'
 
-import { AUTH_COOKIE } from "@/features/auth/constants";
+import { AUTH_COOKIE } from '@/features/auth/constants'
 
 type AdditionalContext = {
-    Variables: {
-        account: AccountType;
-        databases: DatabasesType;
-        storage: StorageType;
-        users: UsersType;
-        user: Models.User<Models.Preferences>
-    }
+  Variables: {
+    account: AccountType
+    databases: DatabasesType
+    storage: StorageType
+    users: UsersType
+    user: Models.User<Models.Preferences>
+  }
 }
 
-export const sessionMiddleware = createMiddleware<AdditionalContext>(async (c, next) => {
-  const client = new Client()
-    .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
-    .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT!)
+export const sessionMiddleware = createMiddleware<AdditionalContext>(
+  async (c, next) => {
+    const client = new Client()
+      .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
+      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT!)
 
     const session = getCookie(c, AUTH_COOKIE)
 
     // here we are use get cookie from hono cookie (here it is directly the value)
     if (!session) {
-        return c.json({error: "Unauthorized"}, 401)
+      return c.json({ error: 'Unauthorized' }, 401)
     }
 
     client.setSession(session)
@@ -48,10 +48,11 @@ export const sessionMiddleware = createMiddleware<AdditionalContext>(async (c, n
 
     const user = await account.get()
 
-    c.set("account", account)
-    c.set("databases", databases)
-    c.set("storage", storage)
-    c.set("user", user)
+    c.set('account', account)
+    c.set('databases', databases)
+    c.set('storage', storage)
+    c.set('user', user)
 
     await next()
-});
+  }
+)

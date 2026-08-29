@@ -1,11 +1,11 @@
-"use client";
+'use client'
 
-import { z } from "zod";
-import { useForm } from "react-hook-form";
+import { z } from 'zod'
+import { useForm } from 'react-hook-form'
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { zodResolver } from '@hookform/resolvers/zod'
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Form,
   FormControl,
@@ -13,33 +13,33 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { DottedSeparator } from "@/components/dotted-separator";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { DatePicker } from "@/components/date-picker";
+} from '@/components/ui/form'
+import { DottedSeparator } from '@/components/dotted-separator'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { DatePicker } from '@/components/date-picker'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select'
 
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils'
 
-import { MemberAvatar } from "@/features/members/components/member-avatar";
-import { ProjectAvatar } from "@/features/projects/components/project-avatar";
+import { MemberAvatar } from '@/features/members/components/member-avatar'
+import { ProjectAvatar } from '@/features/projects/components/project-avatar'
 
-import { useUpdateTask } from "../api/use-update-task";
-import { createTaskSchema } from "../schemas";
-import { Task, TaskStatus } from "../types";
+import { useUpdateTask } from '../api/use-update-task'
+import { createTaskSchema } from '../schemas'
+import { Task, TaskStatus } from '../types'
 
 interface EditTaskFormProps {
-  onCancel?: () => void;
-  projectOptions: { id: string; name: string; imageUrl: string }[];
-  memberOptions: { id: string; name: string }[];
-  initialValues: Task;
+  onCancel?: () => void
+  projectOptions: { id: string; name: string; imageUrl: string }[]
+  memberOptions: { id: string; name: string }[]
+  initialValues: Task
 }
 
 export const EditTaskForm = ({
@@ -48,7 +48,7 @@ export const EditTaskForm = ({
   memberOptions,
   initialValues,
 }: EditTaskFormProps) => {
-  const { mutate, isPending } = useUpdateTask();
+  const { mutate, isPending } = useUpdateTask()
 
   // Use unknown for dueDate to match zod's .coerce.date() input
   //   type RawTaskForm = Omit<z.infer<typeof createTaskSchema>, "dueDate"> & {
@@ -70,7 +70,7 @@ export const EditTaskForm = ({
   const editTaskSchema = createTaskSchema.omit({
     workspaceId: true,
     description: true,
-  });
+  })
 
   const form = useForm<z.input<typeof editTaskSchema>>({
     resolver: zodResolver(editTaskSchema),
@@ -80,7 +80,7 @@ export const EditTaskForm = ({
         ? new Date(initialValues.dueDate)
         : undefined,
     },
-  });
+  })
 
   const onSubmit = (values: z.input<typeof editTaskSchema>) => {
     // zod will coerce dueDate to Date, but ensure it's a Date for API
@@ -96,15 +96,15 @@ export const EditTaskForm = ({
       },
       {
         onSuccess: () => {
-          form.reset();
-          onCancel?.();
+          form.reset()
+          onCancel?.()
         },
       }
-    );
-  };
+    )
+  }
 
   return (
-    <Card className="w-full h-full border-none shadow-none">
+    <Card className="h-full w-full border-none shadow-none">
       <CardHeader className="flex p-7">
         <CardTitle className="text-xl font-bold">Edit a task</CardTitle>
       </CardHeader>
@@ -260,7 +260,7 @@ export const EditTaskForm = ({
                 variant="secondary"
                 onClick={onCancel}
                 disabled={isPending}
-                className={cn(!onCancel && "invisible")}
+                className={cn(!onCancel && 'invisible')}
               >
                 Cancel
               </Button>
@@ -272,5 +272,5 @@ export const EditTaskForm = ({
         </Form>
       </CardContent>
     </Card>
-  );
-};
+  )
+}

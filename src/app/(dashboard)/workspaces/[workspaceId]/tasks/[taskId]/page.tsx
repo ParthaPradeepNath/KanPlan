@@ -1,13 +1,13 @@
-import { getCurrent } from "@/features/auth/queries";
-import { redirect } from "next/navigation";
-import { TaskIdClient } from "./client";
+import { getCurrent } from '@/features/auth/queries'
+import { redirect } from 'next/navigation'
+import { TaskIdClient } from './client'
 
 const TaskIdPage = async () => {
-  const user = await getCurrent();
+  const user = await getCurrent()
   if (!user) {
-    redirect("sign-in");
+    redirect('sign-in')
   }
   return <TaskIdClient />
-};
+}
 
-export default TaskIdPage;
+export default TaskIdPage

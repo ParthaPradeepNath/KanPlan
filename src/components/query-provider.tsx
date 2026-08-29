@@ -36,7 +36,7 @@ function getQueryClient() {
 }
 
 interface QueryProviderProps {
-    children: React.ReactNode
+  children: React.ReactNode
 }
 
 export const QueryProvider = ({ children }: QueryProviderProps) => {

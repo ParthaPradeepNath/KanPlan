@@ -1,47 +1,47 @@
-import { toast } from "sonner";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { InferRequestType, InferResponseType } from "hono";
+import { toast } from 'sonner'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { InferRequestType, InferResponseType } from 'hono'
 
-import { client } from "@/lib/rpc";
+import { client } from '@/lib/rpc'
 
 type ResponseType = InferResponseType<
-  (typeof client.api.projects)[":projectId"]["$patch"],
+  (typeof client.api.projects)[':projectId']['$patch'],
   200
->;
+>
 type RequestType = InferRequestType<
-  (typeof client.api.projects)[":projectId"]["$patch"]
->;
+  (typeof client.api.projects)[':projectId']['$patch']
+>
 
 export const useUpdateProject = () => {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
     mutationFn: async ({ form, param }) => {
-      const response = await client.api.projects[":projectId"]["$patch"]({
+      const response = await client.api.projects[':projectId']['$patch']({
         form,
         param,
-      });
+      })
 
       if (!response.ok) {
-        throw new Error("Failed to update project");
+        throw new Error('Failed to update project')
       }
 
-      return await response.json();
+      return await response.json()
     },
     onSuccess: ({ data }) => {
-      toast.success("Project updated");
+      toast.success('Project updated')
       // Invalidate queries
       queryClient.invalidateQueries({
-        queryKey: ["projects"],
-      });
+        queryKey: ['projects'],
+      })
       queryClient.invalidateQueries({
-        queryKey: ["project", data.$id],
-      });
+        queryKey: ['project', data.$id],
+      })
     },
     onError: () => {
-      toast.error("Failed to update project");
+      toast.error('Failed to update project')
     },
-  });
+  })
 
-  return mutation;
-};
+  return mutation
+}

@@ -1,74 +1,73 @@
-"use client";
+'use client'
 
-import { Fragment } from "react";
-import Link from "next/link";
-import { ArrowLeftIcon, MoreVerticalIcon } from "lucide-react";
+import { Fragment } from 'react'
+import Link from 'next/link'
+import { ArrowLeftIcon, MoreVerticalIcon } from 'lucide-react'
 
-import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
-import { useDeleteMember } from "@/features/members/api/use-delete-member";
-import { useUpdateMember } from "@/features/members/api/use-update-member";
-import { MemberRole } from "@/features/members/types";
+import { useWorkspaceId } from '@/features/workspaces/hooks/use-workspace-id'
+import { useDeleteMember } from '@/features/members/api/use-delete-member'
+import { useUpdateMember } from '@/features/members/api/use-update-member'
+import { MemberRole } from '@/features/members/types'
 
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { DottedSeparator } from "@/components/dotted-separator";
-import { useGetMembers } from "@/features/members/api/use-get-members";
-import { MemberAvatar } from "@/features/members/components/member-avatar";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { DottedSeparator } from '@/components/dotted-separator'
+import { useGetMembers } from '@/features/members/api/use-get-members'
+import { MemberAvatar } from '@/features/members/components/member-avatar'
+import { Separator } from '@/components/ui/separator'
 import {
   DropdownMenu,
   DropdownMenuItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu'
 
-import { useConfirm } from "@/hooks/use-confirm";
+import { useConfirm } from '@/hooks/use-confirm'
 
 export const MembersList = () => {
-  const workspaceId = useWorkspaceId();
+  const workspaceId = useWorkspaceId()
   const [ConfirmDialog, confirm] = useConfirm(
-    "Remove member",
-    "This member will be removed from the workspace",
-    "destructive"
-  );
+    'Remove member',
+    'This member will be removed from the workspace',
+    'destructive'
+  )
 
-  const { data } = useGetMembers({ workspaceId });
+  const { data } = useGetMembers({ workspaceId })
   const { mutate: deleteMember, isPending: isDeletingMember } =
-    useDeleteMember();
+    useDeleteMember()
 
   const { mutate: updateMember, isPending: isUpdatingMember } =
-    useUpdateMember();
+    useUpdateMember()
 
   const handleUpdateMember = (memberId: string, role: MemberRole) => {
     updateMember({
       json: { role },
       param: { memberId },
-    });
-  };
+    })
+  }
 
   const handleDeleteMember = async (memberId: string) => {
-    const ok = await confirm();
+    const ok = await confirm()
 
-    if (!ok) return;
+    if (!ok) return
 
     deleteMember(
       { param: { memberId } },
       {
         onSuccess: () => {
-          window.location.reload();
+          window.location.reload()
         },
       }
-    );
-  };
+    )
+  }
 
   return (
-    <Card className="w-full h-full border-none shadow-none">
+    <Card className="h-full w-full border-none shadow-none">
       <ConfirmDialog />
-      <CardHeader className="flex flex-row items-center gap-x-4 p-7 space-y-0">
+      <CardHeader className="flex flex-row items-center space-y-0 gap-x-4 p-7">
         <Button asChild variant="secondary" size="sm">
           <Link href={`/workspaces/${workspaceId}`}>
-            <ArrowLeftIcon className="size-4 mr-2" />
+            <ArrowLeftIcon className="mr-2 size-4" />
             Back
           </Link>
         </Button>
@@ -88,12 +87,12 @@ export const MembersList = () => {
               />
               <div className="flex flex-col">
                 <p className="text-sm font-medium">{member.name}</p>
-                <p className="text-xs text-muted-foreground">{member.email}</p>
+                <p className="text-muted-foreground text-xs">{member.email}</p>
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button className="ml-auto" variant="secondary" size="icon">
-                    <MoreVerticalIcon className="size-4 text-muted-foreground" />
+                    <MoreVerticalIcon className="text-muted-foreground size-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="bottom" align="end">
@@ -132,5 +131,5 @@ export const MembersList = () => {
         ))}
       </CardContent>
     </Card>
-  );
-};
+  )
+}

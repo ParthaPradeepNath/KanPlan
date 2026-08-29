@@ -1,54 +1,54 @@
-import { toast } from "sonner";
-import { InferRequestType, InferResponseType } from "hono";
+import { toast } from 'sonner'
+import { InferRequestType, InferResponseType } from 'hono'
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-import { client } from "@/lib/rpc";
+import { client } from '@/lib/rpc'
 
 type ResponseType = InferResponseType<
-  (typeof client.api.tasks)[":taskId"]["$patch"],
+  (typeof client.api.tasks)[':taskId']['$patch'],
   200
->;
+>
 type RequestType = InferRequestType<
-  (typeof client.api.tasks)[":taskId"]["$patch"]
->;
+  (typeof client.api.tasks)[':taskId']['$patch']
+>
 
 export const useUpdateTask = () => {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
     mutationFn: async ({ json, param }) => {
-      const response = await client.api.tasks[":taskId"]["$patch"]({
+      const response = await client.api.tasks[':taskId']['$patch']({
         json,
         param,
-      });
+      })
 
       if (!response.ok) {
-        throw new Error("Failed to update task");
+        throw new Error('Failed to update task')
       }
 
-      return await response.json();
+      return await response.json()
     },
     onSuccess: ({ data }) => {
-      toast.success("Task Updated");
+      toast.success('Task Updated')
 
       queryClient.invalidateQueries({
-        queryKey: ["project-analytics"],
-      });
+        queryKey: ['project-analytics'],
+      })
       queryClient.invalidateQueries({
-        queryKey: ["workspace-analytics"],
-      });
+        queryKey: ['workspace-analytics'],
+      })
       queryClient.invalidateQueries({
-        queryKey: ["tasks"],
-      });
+        queryKey: ['tasks'],
+      })
       queryClient.invalidateQueries({
-        queryKey: ["task", data.$id],
-      });
+        queryKey: ['task', data.$id],
+      })
     },
     onError: () => {
-      toast.error("Failed to update task");
+      toast.error('Failed to update task')
     },
-  });
+  })
 
-  return mutation;
-};
+  return mutation
+}

@@ -1,23 +1,26 @@
-"use client";
+'use client'
 
-import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
-import { MenuIcon } from "lucide-react";
+import { useState } from 'react'
+import { usePathname } from 'next/navigation'
+import { MenuIcon } from 'lucide-react'
 
-import { Button } from "./ui/button";
-import { Sheet, SheetTrigger, SheetContent } from "./ui/sheet";
-import { Sidebar } from "./sidebar";
+import { Button } from './ui/button'
+import { Sheet, SheetTrigger, SheetContent } from './ui/sheet'
+import { Sidebar } from './sidebar'
 
 export const MobileSidebar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false)
+  const pathname = usePathname()
 
-  useEffect(() => {
-    setIsOpen(false);
-  }, [pathname]);
+  // Adjust state during render to close the sidebar whenever the route changes
+  const [prevPathname, setPrevPathname] = useState(pathname)
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname)
+    setIsOpen(false)
+  }
 
   return (
-    <Sheet modal={false} open={isOpen} onOpenChange={setIsOpen} >
+    <Sheet modal={false} open={isOpen} onOpenChange={setIsOpen}>
       {/* to remove the hydration error putting a button inside a button so pass asChild inside the trigger to prevent it */}
       <SheetTrigger asChild>
         <Button variant="secondary" className="lg:hidden">
@@ -28,5 +31,5 @@ export const MobileSidebar = () => {
         <Sidebar />
       </SheetContent>
     </Sheet>
-  );
-};
+  )
+}

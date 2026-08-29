@@ -1,49 +1,49 @@
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { InferRequestType, InferResponseType } from "hono";
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
+import { InferRequestType, InferResponseType } from 'hono'
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-import { client } from "@/lib/rpc";
+import { client } from '@/lib/rpc'
 
 type ResponseType = InferResponseType<
-  (typeof client.api.workspaces)[":workspaceId"]["join"]["$post"],
+  (typeof client.api.workspaces)[':workspaceId']['join']['$post'],
   200
->;
+>
 type RequestType = InferRequestType<
-  (typeof client.api.workspaces)[":workspaceId"]["join"]["$post"]
->;
+  (typeof client.api.workspaces)[':workspaceId']['join']['$post']
+>
 
 export const useJoinWorkspace = () => {
-  const router = useRouter();
-  const queryClient = useQueryClient();
+  const router = useRouter()
+  const queryClient = useQueryClient()
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
     mutationFn: async ({ param, json }) => {
-      const response = await client.api.workspaces[":workspaceId"]["join"][
-        "$post"
-      ]({ param, json });
+      const response = await client.api.workspaces[':workspaceId']['join'][
+        '$post'
+      ]({ param, json })
 
       if (!response.ok) {
-        throw new Error("Failed to join workspace");
+        throw new Error('Failed to join workspace')
       }
 
-      return await response.json();
+      return await response.json()
     },
     onSuccess: ({ data }) => {
-      toast.success("Joined workspace");
-      router.refresh();
+      toast.success('Joined workspace')
+      router.refresh()
       queryClient.invalidateQueries({
-        queryKey: ["workspaces"],
-      });
+        queryKey: ['workspaces'],
+      })
       queryClient.invalidateQueries({
-        queryKey: ["workspace", data.$id],
-      });
+        queryKey: ['workspace', data.$id],
+      })
     },
     onError: () => {
-      toast.error("Failed to join workspace");
+      toast.error('Failed to join workspace')
     },
-  });
+  })
 
-  return mutation;
-};
+  return mutation
+}

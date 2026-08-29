@@ -1,47 +1,47 @@
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { InferRequestType, InferResponseType } from "hono";
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
+import { InferRequestType, InferResponseType } from 'hono'
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-import { client } from "@/lib/rpc";
+import { client } from '@/lib/rpc'
 
 type ResponseType = InferResponseType<
-  (typeof client.api.members)[":memberId"]["$patch"],
+  (typeof client.api.members)[':memberId']['$patch'],
   200
->;
+>
 type RequestType = InferRequestType<
-  (typeof client.api.members)[":memberId"]["$patch"]
->;
+  (typeof client.api.members)[':memberId']['$patch']
+>
 
 export const useUpdateMember = () => {
-  const router = useRouter();
-  const queryClient = useQueryClient();
+  const router = useRouter()
+  const queryClient = useQueryClient()
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
     mutationFn: async ({ param, json }) => {
-      const response = await client.api.members[":memberId"]["$patch"]({
+      const response = await client.api.members[':memberId']['$patch']({
         param,
-        json
-      });
+        json,
+      })
 
       if (!response.ok) {
-        throw new Error("Failed to update member");
+        throw new Error('Failed to update member')
       }
 
-      return await response.json();
+      return await response.json()
     },
     onSuccess: () => {
-      toast.success("Member updated");
-      router.refresh();
+      toast.success('Member updated')
+      router.refresh()
       queryClient.invalidateQueries({
-        queryKey: ["members"],
-      });
+        queryKey: ['members'],
+      })
     },
     onError: () => {
-      toast.error("Failed to update member");
+      toast.error('Failed to update member')
     },
-  });
+  })
 
-  return mutation;
+  return mutation
 }
