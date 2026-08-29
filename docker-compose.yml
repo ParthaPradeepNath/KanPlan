@@ -1,5 +1,8 @@
+name: momentum
+
 services:
-  pms:
+  momentum:
+    image: momentum:latest
     build:
       context: .
       args:

@@ -1,6 +1,6 @@
-# KanPlan
+# Momentum
 
-A lightweight, full-featured **project management (Kanban) application** built for agile teams. KanPlan lets you organize your work into workspaces and projects, manage tasks with a drag-and-drop Kanban board, track progress with data tables and analytics, and collaborate with your team — all wrapped in a modern, responsive UI.
+A lightweight, full-featured **project management (Kanban) application** built for agile teams. Momentum lets you organize your work into workspaces and projects, manage tasks with a drag-and-drop Kanban board, track progress with data tables and analytics, and collaborate with your team — all wrapped in a modern, responsive UI.
 
 ## ✨ Features
 
