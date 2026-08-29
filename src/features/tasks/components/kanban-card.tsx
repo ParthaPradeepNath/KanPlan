@@ -25,7 +25,7 @@ export const KanbanCard = ({task}: KanbanCardProps) => {
             <DottedSeparator />
             <div className="flex items-center gap-x-1.5">
                 <MemberAvatar
-                name={task.assignee.name}
+                name={task.assignee?.name ?? ""}
                 fallbackClassName="text-[10px]"
                 />
                 <div className="size-1 rounded-full bg-neutral-300" />
@@ -33,11 +33,11 @@ export const KanbanCard = ({task}: KanbanCardProps) => {
             </div>
             <div className="flex items-center gap-x-1.5">
                 <ProjectAvatar
-                name={task.project.name}
-                image={task.project.imageUrl}
+                name={task.project?.name ?? ""}
+                image={task.project?.imageUrl}
                 fallbackClassName="text-[10px]"
                 />
-                <span className="text-xs font-medium">{task.project.name}</span>
+                <span className="text-xs font-medium">{task.project?.name}</span>
             </div>
         </div>
     )

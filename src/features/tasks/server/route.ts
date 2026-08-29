@@ -5,6 +5,7 @@ import { ID, Query } from "node-appwrite";
 import { sessionMiddleware } from "@/lib/session-middleware";
 import { zValidator } from "@hono/zod-validator";
 import { getMember } from "@/features/members/utils";
+import { Member } from "@/features/members/types";
 import { DATABASE_ID, MEMBERS_ID, PROJECTS_ID, TASKS_ID } from "@/config";
 import { createAdminClient } from "@/lib/appwrite";
 import { Project } from "@/features/projects/types";
@@ -121,7 +122,7 @@ const app = new Hono()
         projectIds.length > 0 ? [Query.contains("$id", projectIds)] : []
       );
 
-      const members = await databases.listDocuments(
+      const members = await databases.listDocuments<Member>(
         DATABASE_ID,
         MEMBERS_ID,
         assigneeIds.length > 0 ? [Query.contains("$id", assigneeIds)] : []
@@ -287,7 +288,7 @@ const app = new Hono()
       PROJECTS_ID,
       task.projectId
     );
-    const member = await databases.getDocument(
+    const member = await databases.getDocument<Member>(
       DATABASE_ID,
       MEMBERS_ID,
       task.assigneeId

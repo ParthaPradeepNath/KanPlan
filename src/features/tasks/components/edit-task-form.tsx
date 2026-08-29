@@ -67,10 +67,13 @@ export const EditTaskForm = ({
   //     },
   //   });
 
-  const form = useForm<z.infer<typeof createTaskSchema>>({
-    resolver: zodResolver(
-      createTaskSchema.omit({ workspaceId: true, description: true })
-    ),
+  const editTaskSchema = createTaskSchema.omit({
+    workspaceId: true,
+    description: true,
+  });
+
+  const form = useForm<z.input<typeof editTaskSchema>>({
+    resolver: zodResolver(editTaskSchema),
     defaultValues: {
       ...initialValues,
       dueDate: initialValues.dueDate
@@ -79,10 +82,18 @@ export const EditTaskForm = ({
     },
   });
 
-  const onSubmit = (values: z.infer<typeof createTaskSchema>) => {
+  const onSubmit = (values: z.input<typeof editTaskSchema>) => {
     // zod will coerce dueDate to Date, but ensure it's a Date for API
     mutate(
-      { json: values, param: { taskId: initialValues.$id } },
+      {
+        json: {
+          ...values,
+          dueDate: values.dueDate
+            ? new Date(values.dueDate as string | number | Date)
+            : undefined,
+        },
+        param: { taskId: initialValues.$id },
+      },
       {
         onSuccess: () => {
           form.reset();

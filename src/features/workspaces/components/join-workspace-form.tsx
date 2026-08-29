@@ -51,7 +51,7 @@ export const JoinWorkspaceForm = ({
       <CardHeader className="p-7">
         <CardTitle className="text-xl font-bold">Join Workspace</CardTitle>
         <CardDescription>
-          You've been invited to join a <strong>{initialValues.name}</strong>{" "}
+          You&apos;ve been invited to join a <strong>{initialValues.name}</strong>{" "}
           workspace.
         </CardDescription>
       </CardHeader>

@@ -56,10 +56,10 @@ export const columns: ColumnDef<Task>[] = [
         <div className="flex items-center gap-x-2 text-sm font-medium">
           <ProjectAvatar
             className="size-6"
-            name={project.name}
-            image={project.imageUrl}
+            name={project?.name ?? ""}
+            image={project?.imageUrl}
           />
-          <p className="line-clamp-1">{project.name}</p>
+          <p className="line-clamp-1">{project?.name}</p>
         </div>
       );
     },
@@ -85,9 +85,9 @@ export const columns: ColumnDef<Task>[] = [
           <MemberAvatar
             className="size-6"
             fallbackClassName="text-sm"
-            name={assignee.name}
+            name={assignee?.name ?? ""}
           />
-          <p className="line-clamp-1">{assignee.name}</p>
+          <p className="line-clamp-1">{assignee?.name}</p>
         </div>
       );
     },

@@ -5,9 +5,9 @@ import { JoinWorkspaceForm } from "@/features/workspaces/components/join-workspa
 import { getWorkspaceInfo } from "@/features/workspaces/queries";
 
 interface WorkspaceIdJoinPageProps {
-  params: {
+  params: Promise<{
     workspaceId: string;
-  };
+  }>;
 }
 
 const WorkspaceIdJoinPage = async ({ params }: WorkspaceIdJoinPageProps) => {
@@ -16,8 +16,10 @@ const WorkspaceIdJoinPage = async ({ params }: WorkspaceIdJoinPageProps) => {
     redirect("/sign-in");
   }
 
+  const { workspaceId } = await params;
+
   const initialValues = await getWorkspaceInfo({
-    workspaceId: params.workspaceId,
+    workspaceId,
   });
 
   if (!initialValues) {

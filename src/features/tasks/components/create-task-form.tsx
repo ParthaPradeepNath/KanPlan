@@ -72,7 +72,7 @@ export const CreateTaskForm = ({
       {
         json: {
           ...values,
-          dueDate: new Date(values.dueDate as any),
+          dueDate: new Date(values.dueDate as string | number | Date),
           workspaceId,
         },
       },
