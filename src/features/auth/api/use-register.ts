@@ -22,7 +22,7 @@ export const useRegister = () => {
       })
 
       if (error) {
-        throw new Error(error.message ?? 'Failed to register')
+        throw new Error(error.message ?? error.code ?? 'Failed to register')
       }
 
       return { success: true }
@@ -34,8 +34,8 @@ export const useRegister = () => {
         queryKey: ['current'],
       })
     },
-    onError: () => {
-      toast.error('Failed to register')
+    onError: (error) => {
+      toast.error(error.message)
     },
   })
 

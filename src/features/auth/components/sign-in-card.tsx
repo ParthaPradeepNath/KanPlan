@@ -3,13 +3,9 @@
 import { z } from 'zod'
 import Link from 'next/link'
 
-import { FcGoogle } from 'react-icons/fc'
-import { FaGithub } from 'react-icons/fa'
 import { useForm } from 'react-hook-form'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-
-import { authClient } from '@/lib/auth-client'
 
 import { DottedSeparator } from '@/components/dotted-separator'
 import { Button } from '@/components/ui/button'
@@ -89,31 +85,6 @@ export const SignInCard = () => {
             </Button>
           </form>
         </Form>
-      </CardContent>
-      <div className="px-7">
-        <DottedSeparator />
-      </div>
-      <CardContent className="flex flex-col gap-y-4 p-7">
-        <Button
-          onClick={() => authClient.signIn.social({ provider: 'google' })}
-          disabled={isPending}
-          size="lg"
-          className="w-full"
-          variant="secondary"
-        >
-          <FcGoogle className="mr-2 size-5" />
-          Login with Google
-        </Button>
-        <Button
-          onClick={() => authClient.signIn.social({ provider: 'github' })}
-          disabled={isPending}
-          size="lg"
-          className="w-full"
-          variant="secondary"
-        >
-          <FaGithub className="mr-2 size-5" />
-          Login with Github
-        </Button>
       </CardContent>
       <div className="px-7">
         <DottedSeparator />

@@ -1,0 +1,14 @@
+/*
+  Warnings:
+
+  - Added the required column `issuer` to the `Account` table without a default value. This is not possible if the table is not empty.
+  - Added the required column `updatedAt` to the `Account` table without a default value. This is not possible if the table is not empty.
+
+*/
+-- AlterTable
+ALTER TABLE "Account" ADD COLUMN     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN     "issuer" TEXT NOT NULL,
+ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL;
+
+-- CreateIndex
+CREATE INDEX "Account_userId_idx" ON "Account"("userId");
