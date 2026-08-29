@@ -57,8 +57,10 @@ A lightweight, full-featured **project management (Kanban) application** built f
 
 ### Prerequisites
 
-- **Node.js** 18.18+ (or 20+ recommended)
+- **Node.js** 20.9+ (required by Next.js 16)
+- **npm** (or pnpm/yarn)
 - A **PostgreSQL** database (e.g. [Neon](https://neon.tech)) — used by both the app and Better Auth
+- *(Optional)* [Docker](https://www.docker.com) with Docker Compose to run the containerized app
 
 ### Installation
 
@@ -67,45 +69,20 @@ A lightweight, full-featured **project management (Kanban) application** built f
 npm install
 
 # 2. Set up environment variables (see below)
-cp .env.example .env.local
+cp .env.example .env
 
-# 3. Push the database schema (Postgres + Better Auth tables)
+# 3. Generate the Prisma client
+npx prisma generate
+
+# 4. Push the database schema (Postgres + Better Auth tables)
 npx prisma migrate deploy
 
-# 4. Run the development server
+# 5. Run the development server
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser.
 
-### Environment Variables
-
-Create a `.env.local` file and fill in the values:
-
-```env
-# Public app URL (used by the Better Auth client)
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-
-# Server URL trusted by Better Auth
-BETTER_AUTH_URL=http://localhost:3000
-
-# Better Auth secret (generate one, e.g. `openssl rand -base64 32`)
-BETTER_AUTH_SECRET=your_better_auth_secret
-
-# PostgreSQL connection string
-DATABASE_URL=postgresql://user:password@host:5432/dbname
-
-# Better Auth OAuth providers (GitHub & Google)
-GITHUB_CLIENT_ID=your_github_client_id
-GITHUB_CLIENT_SECRET=your_github_client_secret
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
-
-# UploadThing (for project/workspace image uploads)
-UPLOADTHING_TOKEN=your_uploadthing_token
-```
-
-> **Note:** KanPlan requires a PostgreSQL database with the schema applied (`npx prisma migrate deploy`), a Better Auth secret, and optional GitHub/Google OAuth credentials. UploadThing credentials are only needed if you want to upload workspace/project images.
 
 ### Scripts
 
@@ -114,20 +91,37 @@ npm run dev          # Start the development server
 npm run build        # Build for production
 npm run start        # Start the production server
 npm run lint         # Run ESLint
+npm run format       # Format code with Prettier
+npx prisma generate  # Generate the Prisma client
 npx prisma migrate dev   # Create & apply a new migration during development
+npx prisma migrate deploy # Apply pending migrations (production)
 npx prisma studio        # Inspect the database
 ```
 
-## 🗺️ Roadmap
+### Docker
 
-- [x] Authentication (email + OAuth)
-- [x] Workspaces & team management
-- [x] Projects
-- [x] Kanban board with drag & drop
-- [x] Data table, calendar, and analytics views
-- [ ] Recurring tasks & notifications
-- [ ] Comments & activity feeds on tasks
-- [ ] Advanced search across projects
+The app ships with a multi-stage `Dockerfile` (Next.js standalone output) and a `docker-compose.yml`. The image is self-contained except for the database, so it connects to your existing Postgres (e.g. Neon) at runtime.
+
+```bash
+# Build and run (reads env vars from .env)
+docker compose up -d --build
+
+# Open http://localhost:3000
+```
+
+Notes:
+
+- **Build-time**: `NEXT_PUBLIC_APP_URL` is inlined into the client bundle. For a real deployment, pass the public URL as a build arg:
+  ```bash
+  docker compose build --build-arg NEXT_PUBLIC_APP_URL=https://yourdomain.com
+  ```
+- **Runtime**: secrets (`DATABASE_URL`, `BETTER_AUTH_SECRET`, `UPLOADTHING_TOKEN`, OAuth keys, etc.) are injected from `.env` via `env_file` — they are **not** baked into the image.
+- **Migrations**: the container doesn't run migrations automatically. Apply them once against your database before starting:
+  ```bash
+  npx prisma migrate deploy
+  ```
+- **Port**: change the host port in `docker-compose.yml` (e.g. `"3001:3000"`) if port 3000 is already in use.
+
 
 ## 🙏 Acknowledgements
 
