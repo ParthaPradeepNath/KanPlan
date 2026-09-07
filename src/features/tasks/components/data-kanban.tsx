@@ -8,40 +8,14 @@ import {
 } from '@hello-pangea/dnd'
 
 import { Task, TaskStatus } from '../types'
+import {
+  BOARDS as boards,
+  buildTasksState,
+  calculateKanbanUpdates,
+  type TasksState,
+} from './kanban-utils'
 import { KanbanColumnHeader } from './kanban-column-header'
 import { KanbanCard } from './kanban-card'
-
-const boards: TaskStatus[] = [
-  TaskStatus.BACKLOG,
-  TaskStatus.TODO,
-  TaskStatus.IN_PROGRESS,
-  TaskStatus.IN_REVIEW,
-  TaskStatus.DONE,
-]
-
-type TasksState = {
-  [key in TaskStatus]: Task[]
-}
-
-const buildTasksState = (tasks: Task[]): TasksState => {
-  const initialState: TasksState = {
-    [TaskStatus.BACKLOG]: [],
-    [TaskStatus.TODO]: [],
-    [TaskStatus.IN_PROGRESS]: [],
-    [TaskStatus.IN_REVIEW]: [],
-    [TaskStatus.DONE]: [],
-  }
-
-  tasks.forEach((task) => {
-    initialState[task.status].push(task)
-  })
-
-  Object.keys(initialState).forEach((status) => {
-    initialState[status as TaskStatus].sort((a, b) => a.position - b.position)
-  })
-
-  return initialState
-}
 
 interface DataKanbanProps {
   data: Task[]
@@ -66,8 +40,6 @@ export const DataKanban = ({ data, onChange }: DataKanbanProps) => {
       if (!result.destination) return
 
       const { source, destination } = result
-      const sourceStatus = source.droppableId as TaskStatus
-      const destStatus = destination.droppableId as TaskStatus
 
       let updatesPayload: {
         id: string
@@ -76,69 +48,16 @@ export const DataKanban = ({ data, onChange }: DataKanbanProps) => {
       }[] = []
 
       setTasks((prevTasks) => {
-        const newTasks = { ...prevTasks }
+        const { nextState, updatesPayload: payload } =
+          calculateKanbanUpdates(prevTasks, source, destination)
 
-        // Safely remove the task from the source column
-        const sourceColumn = [...newTasks[sourceStatus]]
-        const [movedTask] = sourceColumn.splice(source.index, 1)
-
-        // If there's no moved task (shouldn't happen but just in case), return the previous task
-        if (!movedTask) {
+        if (payload.length === 0 && nextState === prevTasks) {
           console.error('No task found at the source index')
           return prevTasks
         }
 
-        // Create a nw task object with potentially updated status
-        const updatedMovedTask =
-          sourceStatus !== destStatus
-            ? { ...movedTask, status: destStatus }
-            : movedTask
-
-        // Update the source column
-        newTasks[sourceStatus] = sourceColumn
-
-        // Add the updated task to the destination column
-        const destColumn = [...newTasks[destStatus]]
-        destColumn.splice(destination.index, 0, updatedMovedTask)
-        newTasks[destStatus] = destColumn
-
-        // Prepare minimal update payloads
-        updatesPayload = []
-
-        // Always update the moved task
-        updatesPayload.push({
-          id: updatedMovedTask.id,
-          status: destStatus,
-          position: Math.min((destination.index + 1) * 1000, 1_000_000),
-        })
-
-        //Update positions for affected tasks in the destination column
-        newTasks[destStatus].forEach((task, index) => {
-          if (task && task.id !== updatedMovedTask.id) {
-            const newPosition = Math.min((index + 1) * 1000, 1_000_000)
-            updatesPayload.push({
-              id: task.id,
-              status: destStatus,
-              position: newPosition,
-            })
-          }
-        })
-
-        // If the task moved between  columns, update positions in the source column
-        if (sourceStatus !== destStatus) {
-          newTasks[sourceStatus].forEach((task, index) => {
-            if (task) {
-              const newPosition = Math.min((index + 1) * 1000, 1_000_000)
-              updatesPayload.push({
-                id: task.id,
-                status: sourceStatus,
-                position: newPosition,
-              })
-            }
-          })
-        }
-
-        return newTasks
+        updatesPayload = payload
+        return nextState
       })
 
       onChange(updatesPayload)
