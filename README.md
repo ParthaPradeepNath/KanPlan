@@ -31,27 +31,28 @@ A lightweight, full-featured **project management (Kanban) application** built f
 
 ## 📁 Project Structure
 
-├── prisma/              # Prisma schema & migrations
+├── prisma/ # Prisma schema & migrations
 ├── src/
-│   ├── app/                  # Next.js App Router pages & layouts
-│   │   ├── (auth)/           # Sign-in / sign-up
-│   │   ├── (dashboard)/      # Authenticated app shell & pages
-│   │   ├── (standalone)/     # Workspace / project settings, members, joining
-│   │   ├── api/[[...route]]/ # Hono API route handler
-│   │   └── api/uploadthing/  # UploadThing route handler
-│   ├── components/           # Shared UI components (shadcn/ui) & app components
-│   ├── features/             # Feature modules (auth, workspaces, projects, tasks, members)
-│   │   └── <feature>/
-│   │       ├── api/          # TanStack Query hooks
-│   │       ├── components/   # Feature-specific UI
-│   │       ├── hooks/        # Custom hooks (modals, filters, ids)
-│   │       ├── schemas.ts    # Zod schemas
-│   │       ├── server/       # Hono route definitions
-│   │       └── queries.ts    # Server-side data fetching
-│   ├── generated/            # Generated Prisma client
-│   ├── hooks/                # App-wide hooks
-│   └── lib/                  # Prisma, Better Auth, UploadThing, RPC, utils
-```
+│ ├── app/ # Next.js App Router pages & layouts
+│ │ ├── (auth)/ # Sign-in / sign-up
+│ │ ├── (dashboard)/ # Authenticated app shell & pages
+│ │ ├── (standalone)/ # Workspace / project settings, members, joining
+│ │ ├── api/[[...route]]/ # Hono API route handler
+│ │ └── api/uploadthing/ # UploadThing route handler
+│ ├── components/ # Shared UI components (shadcn/ui) & app components
+│ ├── features/ # Feature modules (auth, workspaces, projects, tasks, members)
+│ │ └── <feature>/
+│ │ ├── api/ # TanStack Query hooks
+│ │ ├── components/ # Feature-specific UI
+│ │ ├── hooks/ # Custom hooks (modals, filters, ids)
+│ │ ├── schemas.ts # Zod schemas
+│ │ ├── server/ # Hono route definitions
+│ │ └── queries.ts # Server-side data fetching
+│ ├── generated/ # Generated Prisma client
+│ ├── hooks/ # App-wide hooks
+│ └── lib/ # Prisma, Better Auth, UploadThing, RPC, utils
+
+````
 
 ## 🚀 Getting Started
 
@@ -79,10 +80,9 @@ npx prisma migrate deploy
 
 # 5. Run the development server
 npm run dev
-```
+````
 
 Open [http://localhost:3000](http://localhost:3000) with your browser.
-
 
 ### Scripts
 
@@ -92,11 +92,25 @@ npm run build        # Build for production
 npm run start        # Start the production server
 npm run lint         # Run ESLint
 npm run format       # Format code with Prettier
+npm test             # Run Vitest unit + component tests
+npm run test:watch   # Re-run tests on file change
+npm run test:coverage # Run tests with V8 coverage report
+npm run typecheck    # Static type check (tsc --noEmit)
 npx prisma generate  # Generate the Prisma client
 npx prisma migrate dev   # Create & apply a new migration during development
 npx prisma migrate deploy # Apply pending migrations (production)
 npx prisma studio        # Inspect the database
 ```
+
+### Testing
+
+Tests use [Vitest](https://vitest.dev) + [Testing Library](https://testing-library.com)
+and live next to the source as `*.test.ts` / `*.test.tsx` files. They cover
+shared utilities (`cn`, invite codes, label formatting), all Zod schemas
+(auth, workspaces, projects, tasks), the pure Kanban board transition helpers,
+domain enums, and key UI components (`AnalyticsCard`, `DottedSeparator`, `TaskDate`).
+
+See [docs/TESTING.md](docs/TESTING.md) for the full testing guide.
 
 ### Docker
 
@@ -121,7 +135,6 @@ Notes:
   npx prisma migrate deploy
   ```
 - **Port**: change the host port in `docker-compose.yml` (e.g. `"3001:3000"`) if port 3000 is already in use.
-
 
 ## 🙏 Acknowledgements
 

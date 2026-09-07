@@ -46,9 +46,7 @@ describe('createWorkspaceSchema', () => {
 
   it('rejects a blank name', () => {
     expect(createWorkspaceSchema.safeParse({ name: '' }).success).toBe(false)
-    expect(createWorkspaceSchema.safeParse({ name: '   ' }).success).toBe(
-      false
-    )
+    expect(createWorkspaceSchema.safeParse({ name: '   ' }).success).toBe(false)
     expect(createWorkspaceSchema.safeParse({}).success).toBe(false)
   })
 })

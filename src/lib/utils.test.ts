@@ -39,7 +39,9 @@ describe('generateInviteCode', () => {
   })
 
   it('generates unique codes across calls', () => {
-    const codes = new Set(Array.from({ length: 50 }, () => generateInviteCode(6)))
+    const codes = new Set(
+      Array.from({ length: 50 }, () => generateInviteCode(6))
+    )
     // Collisions with 62^6 space are practically impossible
     expect(codes.size).toBe(50)
   })

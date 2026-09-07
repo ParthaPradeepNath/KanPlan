@@ -45,9 +45,9 @@ describe('createProjectSchema', () => {
   })
 
   it('rejects a blank name', () => {
-    expect(
-      createProjectSchema.safeParse({ ...valid, name: '' }).success
-    ).toBe(false)
+    expect(createProjectSchema.safeParse({ ...valid, name: '' }).success).toBe(
+      false
+    )
     expect(
       createProjectSchema.safeParse({ ...valid, name: '   ' }).success
     ).toBe(false)

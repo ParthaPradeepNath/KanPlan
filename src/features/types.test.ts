@@ -15,7 +15,9 @@ describe('TaskStatus', () => {
   })
 
   it('round-trips through JSON', () => {
-    const parsed = JSON.parse(JSON.stringify({ status: TaskStatus.IN_PROGRESS }))
+    const parsed = JSON.parse(
+      JSON.stringify({ status: TaskStatus.IN_PROGRESS })
+    )
     expect(parsed.status).toBe('IN_PROGRESS')
   })
 })

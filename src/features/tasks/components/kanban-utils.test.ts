@@ -108,9 +108,15 @@ describe('calculateKanbanUpdates', () => {
     expect(nextState[TaskStatus.DONE][0]?.status).toBe(TaskStatus.DONE)
 
     const byId = Object.fromEntries(updatesPayload.map((u) => [u.id, u]))
-    expect(byId['t1']).toMatchObject({ status: TaskStatus.DONE, position: 1000 })
+    expect(byId['t1']).toMatchObject({
+      status: TaskStatus.DONE,
+      position: 1000,
+    })
     // t2 shifted to the top of its column
-    expect(byId['t2']).toMatchObject({ status: TaskStatus.TODO, position: 1000 })
+    expect(byId['t2']).toMatchObject({
+      status: TaskStatus.TODO,
+      position: 1000,
+    })
   })
 
   it('reorders within the same column', () => {
@@ -189,8 +195,6 @@ describe('calculateKanbanUpdates', () => {
       { droppableId: TaskStatus.DONE, index: 5000 }
     )
 
-    expect(
-      updatesPayload.find((u) => u.id === 'b1')?.position
-    ).toBe(1_000_000)
+    expect(updatesPayload.find((u) => u.id === 'b1')?.position).toBe(1_000_000)
   })
 })

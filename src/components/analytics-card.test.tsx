@@ -49,7 +49,12 @@ describe('AnalyticsCard', () => {
 
   it('renders zero values without crashing', () => {
     render(
-      <AnalyticsCard title="Total tasks" value={0} variant="down" increaseValue={0} />
+      <AnalyticsCard
+        title="Total tasks"
+        value={0}
+        variant="down"
+        increaseValue={0}
+      />
     )
 
     // Both the card value and the increase value render as "0"

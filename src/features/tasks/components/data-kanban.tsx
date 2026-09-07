@@ -48,8 +48,11 @@ export const DataKanban = ({ data, onChange }: DataKanbanProps) => {
       }[] = []
 
       setTasks((prevTasks) => {
-        const { nextState, updatesPayload: payload } =
-          calculateKanbanUpdates(prevTasks, source, destination)
+        const { nextState, updatesPayload: payload } = calculateKanbanUpdates(
+          prevTasks,
+          source,
+          destination
+        )
 
         if (payload.length === 0 && nextState === prevTasks) {
           console.error('No task found at the source index')

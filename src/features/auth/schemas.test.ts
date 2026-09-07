@@ -55,15 +55,15 @@ describe('registerSchema', () => {
   })
 
   it('rejects a blank name', () => {
-    expect(
-      registerSchema.safeParse({ ...valid, name: '   ' }).success
-    ).toBe(false)
+    expect(registerSchema.safeParse({ ...valid, name: '   ' }).success).toBe(
+      false
+    )
   })
 
   it('rejects an invalid email', () => {
-    expect(
-      registerSchema.safeParse({ ...valid, email: 'nope' }).success
-    ).toBe(false)
+    expect(registerSchema.safeParse({ ...valid, email: 'nope' }).success).toBe(
+      false
+    )
   })
 
   it('rejects passwords shorter than 8 characters', () => {

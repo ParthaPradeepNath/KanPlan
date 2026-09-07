@@ -98,9 +98,7 @@ export const calculateKanbanUpdates = (
   newTasks[sourceStatus] = sourceColumn
 
   const destColumn =
-    sourceStatus === destStatus
-      ? [...sourceColumn]
-      : [...newTasks[destStatus]]
+    sourceStatus === destStatus ? [...sourceColumn] : [...newTasks[destStatus]]
   // When moving within the same column, sourceColumn was already spliced
   // above, so rebuild from it; otherwise insert into the destination copy.
   if (sourceStatus === destStatus) {

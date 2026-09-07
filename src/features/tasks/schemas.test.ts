@@ -20,9 +20,9 @@ describe('createTaskSchema', () => {
 
   it('accepts every TaskStatus value', () => {
     for (const status of Object.values(TaskStatus)) {
-      expect(
-        createTaskSchema.safeParse({ ...validTask, status }).success
-      ).toBe(true)
+      expect(createTaskSchema.safeParse({ ...validTask, status }).success).toBe(
+        true
+      )
     }
   })
 
