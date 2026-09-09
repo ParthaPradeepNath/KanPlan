@@ -1,4 +1,4 @@
-# Momentum
+# KanPlan
 
 **A lightweight project management app for agile teams.**
 
